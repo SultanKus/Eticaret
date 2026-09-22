@@ -147,7 +147,7 @@ if not os.path.exists(USERS_FILE):
 if not os.path.exists(ADDRESS_FILE):
     pd.DataFrame(columns=["email", "title", "city", "district", "neighborhood", "postal_code", "detail", "phone"]).to_csv(ADDRESS_FILE, index=False)
 
-@st.cache_data
+# Verileri Yükle
 def load_products():
     return pd.read_csv(CSV_FILE)
 
@@ -279,7 +279,7 @@ else:
 
 st.sidebar.divider()
 
-# --- ADMIN PANELİ (BİLGİSAYARDAN DOSYA YÜKLEME DESTEKLİ) ---
+# --- ADMIN PANELİ (DÜZELTİLMİŞ ÜRÜN VE DOSYA EKLEME) ---
 if st.session_state.logged_in and st.session_state.user_email == ADMIN_EMAIL:
     st.sidebar.subheader("🛠️ Mağaza Yönetimi (Admin)")
     admin_mode = st.sidebar.checkbox("Yönetim Paneli Aç", key="admin_chk")
@@ -293,16 +293,12 @@ if st.session_state.logged_in and st.session_state.user_email == ADMIN_EMAIL:
         new_stock = st.sidebar.number_input("Stok Adedi", min_value=1, value=1, key="admin_prod_stock")
         new_desc = st.sidebar.text_area("Açıklama", key="admin_prod_desc")
         
-        # BİLGİSAYARDAN RESİM YÜKLEME ALANI
         uploaded_file = st.sidebar.file_uploader("Bilgisayardan Görsel Seç (PNG, JPG)", type=["png", "jpg", "jpeg"], key="admin_img_upload")
-        
-        # Alternatif olarak URL ile de yüklenebilsin
         alt_img_url = st.sidebar.text_input("Veya Görsel URL Yapıştır", key="admin_prod_img")
 
         if st.sidebar.button("Ürünü Mağazaya Ekle", key="admin_btn_add"):
             final_image_path = ""
             if uploaded_file is not None:
-                # Dosyayı sunucuya / klasöre kaydet
                 file_path = os.path.join(UPLOAD_DIR, uploaded_file.name)
                 with open(file_path, "wb") as f:
                     f.write(uploaded_file.getbuffer())
@@ -321,8 +317,11 @@ if st.session_state.logged_in and st.session_state.user_email == ADMIN_EMAIL:
                 }])
                 updated_df = pd.concat([product_df, new_row], ignore_index=True)
                 updated_df.to_csv(CSV_FILE, index=False)
-                st.sidebar.success("Ürün başarıyla eklendi!")
-                st.rerun()
+                
+                # BAŞARI BİLDİRİMİ EKRANDA NET GÖRÜNÜR
+                st.sidebar.success(f"'{new_title}' başarıyla mağazaya eklendi!")
+                st.success(f"✨ Yeni Eser Eklendi: {new_title} - Vitrin güncellendi!")
+                st.balloons()
             else:
                 st.sidebar.warning("Eser adı zorunludur.")
     st.sidebar.divider()
