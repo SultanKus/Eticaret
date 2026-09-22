@@ -11,29 +11,71 @@ USERS_FILE = "users.csv"
 ADMIN_EMAIL = "skus42173@gmail.com"
 WHATSAPP_PHONE = "905527920708"
 
-# Sıcak Sanatsal Tasarım & CSS Entegrasyonu
+# Sıcak Sanatsal Tasarım & Sidebar Stilleri
 st.markdown("""
     <style>
+    /* Ana Sayfa Arka Planı ve Yazı Rengi */
     .stApp {
         background-color: #FDFBF7;
         color: #2C2A29;
     }
-    .hero-banner {
-        background: linear-gradient(135deg, #D4A373, #CCD5AE, #E9EDC9);
-        padding: 40px;
-        border-radius: 15px;
-        text-align: center;
-        color: #283618;
-        margin-bottom: 25px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    
+    /* Sol Sidebar (Yan Panel) Renklendirmesi */
+    [data-testid="stSidebar"] {
+        background-color: #F4EFEA;
+        border-right: 1px solid #E6DFD5;
     }
-    .product-card {
-        background-color: #FFFFFF;
-        padding: 15px;
+    [data-testid="stSidebar"] .stMarkdown, [data-testid="stSidebar"] label {
+        color: #4A3B32 !important;
+    }
+    
+    /* Otomatik Yana Kayan Slider (Marquee) Stili */
+    .slider-container {
+        overflow: hidden;
+        white-space: nowrap;
+        width: 100%;
+        background: linear-gradient(135deg, #E6DFD5, #F5F1EB);
+        padding: 20px 0;
+        border-radius: 15px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    }
+    .slider-track {
+        display: inline-block;
+        animation: scroll 25s linear infinite;
+    }
+    .slider-track:hover {
+        animation-play-state: paused;
+    }
+    .slide-item {
+        display: inline-block;
+        width: 280px;
+        margin: 0 15px;
+        background: white;
         border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        margin-bottom: 20px;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.08);
         border: 1px solid #E6DFD5;
+        vertical-align: top;
+        text-align: center;
+        padding-bottom: 10px;
+    }
+    .slide-item img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+    }
+    .slide-title {
+        font-family: serif;
+        font-weight: bold;
+        color: #4A3B32;
+        font-size: 16px;
+        margin: 10px 5px 5px 5px;
+    }
+    
+    @keyframes scroll {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
     }
     </style>
 """, unsafe_allow_html=True)
@@ -94,7 +136,7 @@ def send_real_email(to_email, subject, body):
 
 # --- ŞIK YARENART BAŞLIĞI ---
 st.markdown("""
-    <div style='text-align: center; padding: 15px 0;'>
+    <div style='text-align: center; padding: 10px 0;'>
         <h1 style='font-family: serif; font-size: 52px; font-weight: bold; color: #4A3B32; letter-spacing: 2px;'>
             ✨ YARENART ✨
         </h1>
@@ -102,32 +144,29 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# --- KAYAN / BANNER VİTRİN ALANI (HERO SLIDER GÖRÜNÜMÜ) ---
+# --- OTOMATİK YANA KAYAN RESİM VİTRİNİ (SLIDER / MARQUEE) ---
 st.markdown("""
-    <div class="hero-banner">
-        <h2 style='font-family: serif; margin-bottom: 10px;'>Çerçeveli & Orijinal Tuval Koleksiyonu</h2>
-        <p style='font-size: 16px; margin-bottom: 0;'>Eşsiz renk geçişleri ve özel tasarım el yapımı eserler şimdi sizlerle.</p>
+    <div class="slider-container">
+        <div class="slider-track">
+            <!-- 1. Döngü -->
+            <div class="slide-item"><img src="https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Baş Yapıt Kanvas</div></div>
+            <div class="slide-item"><img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Soyut Geometrik</div></div>
+            <div class="slide-item"><img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Siyah Beyaz Koleksiyon</div></div>
+            <div class="slide-item"><img src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Manzara Serisi</div></div>
+            <div class="slide-item"><img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Özel İllüstrasyon</div></div>
+            <!-- Kesintisiz Akış İçin Tekrar (2. Döngü) -->
+            <div class="slide-item"><img src="https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Baş Yapıt Kanvas</div></div>
+            <div class="slide-item"><img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Soyut Geometrik</div></div>
+            <div class="slide-item"><img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Siyah Beyaz Koleksiyon</div></div>
+            <div class="slide-item"><img src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Manzara Serisi</div></div>
+            <div class="slide-item"><img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Özel İllüstrasyon</div></div>
+        </div>
     </div>
 """, unsafe_allow_html=True)
 
-# --- ÖRNEK GÖRSELDEKİ KATEGORİ KARTLARI ---
-st.markdown("### 🏛️ Öne Çıkan Koleksiyonlar")
-cat_cols = st.columns(4)
-categories_show = [
-    ("Baş Yapıt Kanvaslar", "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=500&q=80"),
-    ("Soyut Kanvas Tablolar", "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=500&q=80"),
-    ("Siyah Beyaz Kanvaslar", "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=500&q=80"),
-    ("Manzara Kanvas Tabloları", "https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=500&q=80")
-]
-
-for idx, (cat_name, cat_img) in enumerate(categories_show):
-    with cat_cols[idx]:
-        st.image(cat_img, use_container_width=True)
-        st.markdown(f"<p style='text-align: center; font-weight: bold; color: #4A3B32;'>{cat_name}</p>", unsafe_allow_html=True)
-
 st.divider()
 
-# --- SIDEBAR: KULLANICI, SEPET VE ADMIN ---
+# --- SIDEBAR: KULLANICI, SEPET VE ADMIN (Sıcak Tonlar) ---
 st.sidebar.header("👤 Kullanıcı & Hesap")
 
 if not st.session_state.logged_in:
@@ -168,7 +207,7 @@ if not st.session_state.logged_in:
             else:
                 st.sidebar.error("Hatalı e-posta veya şifre!")
 else:
-    st.sidebar.write(f"Hoş geldin, **{st.session_state.user_name}** ({st.session_state.user_email})")
+    st.sidebar.write(f"Hoş geldin, **{st.session_state.user_name}**")
     if st.sidebar.button("Çıkış Yap"):
         st.session_state.logged_in = False
         st.session_state.user_name = ""
