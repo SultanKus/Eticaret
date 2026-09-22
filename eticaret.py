@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import sqlite3
 import smtplib
 import hashlib
 import re
@@ -15,10 +16,7 @@ import os
 # =========================================================
 st.set_page_config(page_title="YARENART | Sanat & İllüstrasyon Mağazası", page_icon="🎨", layout="wide")
 
-CSV_FILE = "products.csv"
-USERS_FILE = "users.csv"
-ADDRESS_FILE = "addresses.csv"
-ORDERS_FILE = "orders.csv"
+DB_FILE = "yarenart.db"
 UPLOAD_DIR = "uploaded_images"
 ADMIN_EMAIL = "skus42173@gmail.com"
 WHATSAPP_PHONE = "905527920708"
@@ -39,165 +37,151 @@ TURKEY_CITIES = {
 }
 
 # =========================================================
-#  STİL (renk paleti korunup kontrast/tipografi iyileştirildi)
+#  STİL
 # =========================================================
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap');
-
     html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
-
-    .stApp {
-        background-color: #FBF8F3 !important;
-        color: #2C2A29 !important;
-    }
-    [data-testid="stSidebar"] {
-        background-color: #F4EFEA !important;
-        border-right: 1px solid #E6DFD5;
-    }
-    [data-testid="stSidebar"] div, [data-testid="stSidebar"] span, [data-testid="stSidebar"] label, [data-testid="stSidebar"] p {
-        color: #3E332B !important;
-    }
-    input, textarea, select {
-        background-color: #FFFFFF !important;
-        color: #2C2A29 !important;
-        border-radius: 8px !important;
-        border: 1px solid #D4C9BC !important;
-    }
-    .stButton>button {
-        background-color: #BC6C25 !important;
-        color: #FFFFFF !important;
-        font-weight: 600;
-        border-radius: 8px;
-        border: none;
-        padding: 0.5rem 1rem;
-        transition: all 0.15s ease-in-out;
-    }
-    .stButton>button:hover {
-        background-color: #9C5419 !important;
-        color: #FFFFFF !important;
-        transform: translateY(-1px);
-        box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-    }
-    .stButton>button:disabled {
-        background-color: #D9CFC2 !important;
-        color: #8C7A6B !important;
-        transform: none;
-        box-shadow: none;
-    }
-
-    /* Ürün kartı */
-    .product-card {
-        background: #FFFFFF;
-        border-radius: 14px;
-        overflow: hidden;
-        border: 1px solid #ECE4D8;
-        box-shadow: 0 3px 10px rgba(74,59,50,0.06);
-        transition: box-shadow 0.2s ease, transform 0.2s ease;
-        margin-bottom: 14px;
-    }
-    .product-card:hover {
-        box-shadow: 0 8px 20px rgba(74,59,50,0.14);
-        transform: translateY(-2px);
-    }
-    .product-badge {
-        display: inline-block;
-        background: #F4EFEA;
-        color: #8C5A2B;
-        font-size: 11px;
-        font-weight: 600;
-        padding: 2px 10px;
-        border-radius: 20px;
-        margin-bottom: 4px;
-        letter-spacing: 0.3px;
-    }
+    .stApp { background-color: #FBF8F3 !important; color: #2C2A29 !important; }
+    [data-testid="stSidebar"] { background-color: #F4EFEA !important; border-right: 1px solid #E6DFD5; }
+    [data-testid="stSidebar"] div, [data-testid="stSidebar"] span, [data-testid="stSidebar"] label, [data-testid="stSidebar"] p { color: #3E332B !important; }
+    input, textarea, select { background-color: #FFFFFF !important; color: #2C2A29 !important; border-radius: 8px !important; border: 1px solid #D4C9BC !important; }
+    .stButton>button { background-color: #BC6C25 !important; color: #FFFFFF !important; font-weight: 600; border-radius: 8px; border: none; padding: 0.5rem 1rem; transition: all 0.15s ease-in-out; }
+    .stButton>button:hover { background-color: #9C5419 !important; color: #FFFFFF !important; transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
+    .stButton>button:disabled { background-color: #D9CFC2 !important; color: #8C7A6B !important; transform: none; box-shadow: none; }
+    .product-card { background: #FFFFFF; border-radius: 14px; overflow: hidden; border: 1px solid #ECE4D8; box-shadow: 0 3px 10px rgba(74,59,50,0.06); transition: box-shadow 0.2s ease, transform 0.2s ease; margin-bottom: 14px; }
+    .product-card:hover { box-shadow: 0 8px 20px rgba(74,59,50,0.14); transform: translateY(-2px); }
+    .product-badge { display: inline-block; background: #F4EFEA; color: #8C5A2B; font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 20px; margin-bottom: 4px; letter-spacing: 0.3px; }
     .stock-low { color: #B3401D; font-weight: 600; font-size: 12px; }
     .stock-out { color: #A3A3A3; font-weight: 600; font-size: 12px; }
-
-    .slider-wrapper {
-        overflow: hidden;
-        width: 100%;
-        background: linear-gradient(135deg, #E6DFD5, #F5F1EB);
-        padding: 20px 0;
-        border-radius: 15px;
-        margin-bottom: 25px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-    }
-    .slider-track {
-        display: flex;
-        gap: 20px;
-        width: max-content;
-        animation: scrollAuto 30s linear infinite;
-    }
+    .slider-wrapper { overflow: hidden; width: 100%; background: linear-gradient(135deg, #E6DFD5, #F5F1EB); padding: 20px 0; border-radius: 15px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+    .slider-track { display: flex; gap: 20px; width: max-content; animation: scrollAuto 30s linear infinite; }
     .slider-wrapper:hover .slider-track { animation-play-state: paused; }
-    .slide-item {
-        width: 240px;
-        background: white;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-        border: 1px solid #E6DFD5;
-        text-align: center;
-        padding-bottom: 12px;
-        flex-shrink: 0;
-    }
+    .slide-item { width: 240px; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border: 1px solid #E6DFD5; text-align: center; padding-bottom: 12px; flex-shrink: 0; }
     .slide-item img { width: 100%; height: 160px; object-fit: cover; }
     .slide-title { font-family: 'Playfair Display', serif; font-weight: 700; color: #4A3B32; font-size: 15px; margin: 10px 5px 5px 5px; }
     @keyframes scrollAuto { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-
     h1, h2, h3 { font-family: 'Playfair Display', serif; }
+    .verify-banner { background:#FFF4E5; border:1px solid #F0C68A; padding:12px 16px; border-radius:10px; color:#7A4A12; font-size:14px; margin-bottom:10px; }
     </style>
 """, unsafe_allow_html=True)
 
 # =========================================================
-#  VERİ DOSYALARI
+#  VERİTABANI (SQLite)
 # =========================================================
-if not os.path.exists(CSV_FILE):
-    initial_data = {
-        "id": [1, 2, 3, 4],
-        "title": ["Surreal Bakış & Rüya Odası", "Soyut Düşler (Tuval Baskı)", "Suluboya Botanik Serisi", "Portre Çalışması - 01"],
-        "category": ["Baş Yapıt", "Baskı", "Suluboya", "Portre"],
-        "price": [2500.0, 450.0, 350.0, 900.0],
-        "stock": [1, 5, 4, 2],
-        "description": ["Sanatçının elinden çıkan orijinal başyapıt.", "Yüksek kaliteli mat kuşe kağıda sınırlı sayıdaki imzalı baskı.", "Özel suluboya kağıdı üzerine el yapımı botanik illüstrasyon.", "Detaylı portre çalışması."],
-        "image_url": [
-            "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=600&q=80",
-            "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=600&q=80",
-            "https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=600&q=80",
-            "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=600&q=80"
+def get_conn():
+    conn = sqlite3.connect(DB_FILE, check_same_thread=False)
+    conn.execute("PRAGMA foreign_keys = ON")
+    return conn
+
+
+def init_db():
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS products (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            category TEXT,
+            price REAL NOT NULL,
+            stock INTEGER NOT NULL DEFAULT 0,
+            description TEXT,
+            image_url TEXT
+        )
+    """)
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            email TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            verified INTEGER NOT NULL DEFAULT 0,
+            verify_token TEXT
+        )
+    """)
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS addresses (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT NOT NULL,
+            title TEXT,
+            city TEXT,
+            district TEXT,
+            neighborhood TEXT,
+            postal_code TEXT,
+            detail TEXT,
+            phone TEXT
+        )
+    """)
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS orders (
+            order_id TEXT PRIMARY KEY,
+            timestamp TEXT,
+            user_email TEXT,
+            user_name TEXT,
+            items_json TEXT,
+            total REAL,
+            address_json TEXT,
+            status TEXT
+        )
+    """)
+    conn.commit()
+
+    cur.execute("SELECT COUNT(*) FROM products")
+    if cur.fetchone()[0] == 0:
+        seed = [
+            ("Surreal Bakış & Rüya Odası", "Baş Yapıt", 2500.0, 1, "Sanatçının elinden çıkan orijinal başyapıt.", "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=600&q=80"),
+            ("Soyut Düşler (Tuval Baskı)", "Baskı", 450.0, 5, "Yüksek kaliteli mat kuşe kağıda sınırlı sayıdaki imzalı baskı.", "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=600&q=80"),
+            ("Suluboya Botanik Serisi", "Suluboya", 350.0, 4, "Özel suluboya kağıdı üzerine el yapımı botanik illüstrasyon.", "https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=600&q=80"),
+            ("Portre Çalışması - 01", "Portre", 900.0, 2, "Detaylı portre çalışması.", "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=600&q=80"),
         ]
-    }
-    pd.DataFrame(initial_data).to_csv(CSV_FILE, index=False)
+        cur.executemany("INSERT INTO products (title, category, price, stock, description, image_url) VALUES (?,?,?,?,?,?)", seed)
+        conn.commit()
 
-if not os.path.exists(USERS_FILE):
-    pd.DataFrame(columns=["name", "email", "password"]).to_csv(USERS_FILE, index=False)
+    conn.close()
 
-if not os.path.exists(ADDRESS_FILE):
-    pd.DataFrame(columns=["email", "title", "city", "district", "neighborhood", "postal_code", "detail", "phone"]).to_csv(ADDRESS_FILE, index=False)
+init_db()
 
-if not os.path.exists(ORDERS_FILE):
-    pd.DataFrame(columns=["order_id", "timestamp", "user_email", "user_name", "items_json", "total", "address_json", "status"]).to_csv(ORDERS_FILE, index=False)
+
+def fetch_df(query, params=()):
+    conn = get_conn()
+    try:
+        return pd.read_sql_query(query, conn, params=params)
+    finally:
+        conn.close()
+
+def run_query(query, params=()):
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute(query, params)
+        conn.commit()
+        return cur.lastrowid
+    finally:
+        conn.close()
 
 
 def load_products():
-    return pd.read_csv(CSV_FILE)
+    return fetch_df("SELECT * FROM products")
 
 def load_users():
-    return pd.read_csv(USERS_FILE)
+    return fetch_df("SELECT * FROM users")
 
-def load_addresses():
-    return pd.read_csv(ADDRESS_FILE)
+def load_addresses(email=None):
+    if email:
+        return fetch_df("SELECT * FROM addresses WHERE email = ?", (email,))
+    return fetch_df("SELECT * FROM addresses")
 
-def load_orders():
-    return pd.read_csv(ORDERS_FILE)
+def load_orders(email=None):
+    if email:
+        return fetch_df("SELECT * FROM orders WHERE user_email = ?", (email,))
+    return fetch_df("SELECT * FROM orders")
 
 
 # =========================================================
-#  GÜVENLİK: ŞİFRE HASH'LEME
+#  GÜVENLİK
 # =========================================================
 def hash_password(password: str) -> str:
-    """Basit ama düz metinden çok daha güvenli bir SHA-256 hash.
-    Not: Prodüksiyonda bcrypt/argon2 + salt kullanılması önerilir."""
     return hashlib.sha256(password.encode("utf-8")).hexdigest()
 
 EMAIL_REGEX = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
@@ -207,16 +191,26 @@ def is_valid_email(email: str) -> bool:
 
 
 # =========================================================
-#  E-POSTA: GERÇEK SMTP GÖNDERİMİ
+#  UYGULAMA URL'Sİ (doğrulama linki için)
+# =========================================================
+def get_app_url():
+    try:
+        url = st.secrets.get("APP_URL", os.environ.get("APP_URL"))
+    except Exception:
+        url = os.environ.get("APP_URL")
+    return url or "http://localhost:8501"
+
+
+# =========================================================
+#  E-POSTA
 # =========================================================
 def get_smtp_config():
-    """SMTP ayarlarını önce st.secrets, sonra ortam değişkenlerinden okur.
-    .streamlit/secrets.toml içine şunu ekleyin:
-
+    """.streamlit/secrets.toml içine ekleyin:
     SMTP_EMAIL = "your@gmail.com"
     SMTP_PASSWORD = "16-haneli-uygulama-sifresi"
     SMTP_SERVER = "smtp.gmail.com"
     SMTP_PORT = 587
+    APP_URL = "https://uygulama-adresiniz.streamlit.app"
     """
     try:
         email = st.secrets.get("SMTP_EMAIL", os.environ.get("SMTP_EMAIL"))
@@ -247,7 +241,6 @@ def send_real_email(to_email: str, subject: str, body_text: str, body_html: str 
         msg.attach(MIMEText(body_text, "plain", "utf-8"))
         if body_html:
             msg.attach(MIMEText(body_html, "html", "utf-8"))
-
         with smtplib.SMTP(config["server"], config["port"], timeout=15) as server:
             server.starttls()
             server.login(config["email"], config["password"])
@@ -256,6 +249,25 @@ def send_real_email(to_email: str, subject: str, body_text: str, body_html: str 
     except Exception as e:
         print(f"[HATA] Mail gönderilemedi -> {to_email}: {e}")
         return False
+
+
+def send_verification_email(name: str, email: str, token: str) -> bool:
+    link = f"{get_app_url()}/?verify_token={token}"
+    body = f"""Sayın {name},
+
+YARENART'a üyeliğiniz için son bir adım kaldı. Hesabınızı doğrulamak için aşağıdaki bağlantıya tıklayın:
+
+{link}
+
+Bu bağlantıyı siz talep etmediyseniz bu e-postayı yok sayabilirsiniz.
+
+YARENART Ekibi"""
+    html = f"""<p>Sayın {name},</p>
+<p>YARENART'a üyeliğiniz için son bir adım kaldı. Hesabınızı doğrulamak için aşağıdaki bağlantıya tıklayın:</p>
+<p><a href="{link}" style="background:#BC6C25;color:#fff;padding:10px 18px;border-radius:6px;text-decoration:none;">Hesabımı Doğrula</a></p>
+<p>Bu bağlantıyı siz talep etmediyseniz bu e-postayı yok sayabilirsiniz.</p>
+<p>YARENART Ekibi</p>"""
+    return send_real_email(email, "YARENART - Hesabınızı Doğrulayın", body, html)
 
 
 # =========================================================
@@ -268,8 +280,7 @@ if "user_name" not in st.session_state:
 if "user_email" not in st.session_state:
     st.session_state.user_email = ""
 if "cart" not in st.session_state:
-    st.session_state.cart = []  # her öğe: {id, title, price, qty}
-
+    st.session_state.cart = []
 
 def add_to_cart(product_id, title, price, stock, qty=1):
     for item in st.session_state.cart:
@@ -288,13 +299,27 @@ def add_to_cart(product_id, title, price, stock, qty=1):
 
 
 # =========================================================
+#  E-POSTA DOĞRULAMA LİNKİ İŞLEME (?verify_token=...)
+# =========================================================
+qp = st.query_params
+if "verify_token" in qp:
+    token = qp["verify_token"]
+    users_df = load_users()
+    match = users_df[users_df["verify_token"] == token]
+    if not match.empty:
+        run_query("UPDATE users SET verified = 1, verify_token = NULL WHERE verify_token = ?", (token,))
+        st.success("✅ E-posta adresiniz doğrulandı! Artık giriş yapabilirsiniz.")
+    else:
+        st.error("Geçersiz veya süresi dolmuş doğrulama bağlantısı.")
+    st.query_params.clear()
+    st.stop()
+
+# =========================================================
 #  BAŞLIK
 # =========================================================
 st.markdown("""
     <div style='text-align: center; padding: 10px 0;'>
-        <h1 style='font-size: 52px; font-weight: 700; color: #4A3B32; letter-spacing: 2px;'>
-            ✨ YARENART ✨
-        </h1>
+        <h1 style='font-size: 52px; font-weight: 700; color: #4A3B32; letter-spacing: 2px;'>✨ YARENART ✨</h1>
         <p style='color: #8C7A6B; font-size: 18px; font-style: italic;'>Ressamın Elinden Sanatsal Dokunuşlar & Tablolar</p>
     </div>
 """, unsafe_allow_html=True)
@@ -341,27 +366,37 @@ if not st.session_state.logged_in:
             elif email_input in users_df["email"].values:
                 st.sidebar.warning("Bu e-posta zaten kayıtlı!")
             else:
-                new_user = pd.DataFrame([[name_input, email_input, hash_password(pass_input)]], columns=["name", "email", "password"])
-                updated_users = pd.concat([users_df, new_user], ignore_index=True)
-                updated_users.to_csv(USERS_FILE, index=False)
-                st.sidebar.success("Kayıt başarılı! Şimdi giriş yapabilirsiniz.")
-                send_real_email(
-                    email_input,
-                    "YARENART'a Hoş Geldiniz!",
-                    f"Sayın {name_input},\n\nMağazamıza üyeliğiniz başarıyla oluşturulmuştur.\n\nYARENART Ekibi"
+                token = uuid.uuid4().hex
+                run_query(
+                    "INSERT INTO users (name, email, password_hash, verified, verify_token) VALUES (?,?,?,0,?)",
+                    (name_input, email_input, hash_password(pass_input), token)
                 )
+                mail_ok = send_verification_email(name_input, email_input, token)
+                if mail_ok:
+                    st.sidebar.success("Kayıt alındı! Doğrulama bağlantısı e-postanıza gönderildi.")
+                else:
+                    st.sidebar.warning("Kayıt alındı ama doğrulama e-postası gönderilemedi (SMTP ayarlarını kontrol edin).")
     else:
         if st.sidebar.button("Giriş Yap", key="btn_login"):
             hashed = hash_password(pass_input) if pass_input else ""
-            matched = users_df[(users_df["email"] == email_input) & (users_df["password"] == hashed)]
-            if not matched.empty:
+            matched = users_df[(users_df["email"] == email_input) & (users_df["password_hash"] == hashed)]
+            if matched.empty:
+                st.sidebar.error("Hatalı e-posta veya şifre!")
+            elif matched.iloc[0]["verified"] != 1:
+                st.sidebar.warning("Hesabınız henüz doğrulanmamış. E-postanızı kontrol edin.")
+                if st.sidebar.button("Doğrulama e-postasını tekrar gönder", key="resend_verify"):
+                    new_token = uuid.uuid4().hex
+                    run_query("UPDATE users SET verify_token = ? WHERE email = ?", (new_token, email_input))
+                    if send_verification_email(matched.iloc[0]["name"], email_input, new_token):
+                        st.sidebar.success("Doğrulama e-postası tekrar gönderildi.")
+                    else:
+                        st.sidebar.error("E-posta gönderilemedi. SMTP ayarlarını kontrol edin.")
+            else:
                 st.session_state.logged_in = True
                 st.session_state.user_name = matched.iloc[0]["name"]
                 st.session_state.user_email = email_input
                 st.sidebar.success("Giriş başarılı!")
                 st.rerun()
-            else:
-                st.sidebar.error("Hatalı e-posta veya şifre!")
 else:
     st.sidebar.markdown(f"<p style='color: #4A3B32; font-weight: bold; font-size: 16px;'>Hoş geldin, {st.session_state.user_name}</p>", unsafe_allow_html=True)
     st.sidebar.markdown(f"<p style='color: #6C5B52; font-size: 13px;'>{st.session_state.user_email}</p>", unsafe_allow_html=True)
@@ -377,18 +412,16 @@ else:
 
         if st.button("Adresi Kaydet", key="btn_save_addr"):
             if addr_title and addr_neigh and addr_detail:
-                addr_df = load_addresses()
-                new_addr = pd.DataFrame([[st.session_state.user_email, addr_title, addr_city, addr_district, addr_neigh, addr_postal, addr_detail, addr_phone]],
-                                        columns=["email", "title", "city", "district", "neighborhood", "postal_code", "detail", "phone"])
-                updated_addrs = pd.concat([addr_df, new_addr], ignore_index=True)
-                updated_addrs.to_csv(ADDRESS_FILE, index=False)
+                run_query(
+                    "INSERT INTO addresses (email, title, city, district, neighborhood, postal_code, detail, phone) VALUES (?,?,?,?,?,?,?,?)",
+                    (st.session_state.user_email, addr_title, addr_city, addr_district, addr_neigh, addr_postal, addr_detail, addr_phone)
+                )
                 st.success("Adres başarıyla kaydedildi!")
             else:
                 st.warning("Lütfen başlık, mahalle ve adres detayını doldurun.")
 
     with st.sidebar.expander("📦 Siparişlerim"):
-        my_orders = load_orders()
-        my_orders = my_orders[my_orders["user_email"] == st.session_state.user_email]
+        my_orders = load_orders(st.session_state.user_email)
         if my_orders.empty:
             st.write("Henüz siparişiniz yok.")
         else:
@@ -438,8 +471,7 @@ if len(st.session_state.cart) > 0:
     if not st.session_state.logged_in:
         st.sidebar.warning("Sipariş vermek için önce giriş yapmalısınız!")
     else:
-        all_addrs = load_addresses()
-        user_addrs = all_addrs[all_addrs["email"] == st.session_state.user_email]
+        user_addrs = load_addresses(st.session_state.user_email)
 
         selected_address_info = None
         chosen_addr_title = "Yeni Adres Gir..."
@@ -451,12 +483,9 @@ if len(st.session_state.cart) > 0:
             if chosen_addr_title != "Yeni Adres Gir...":
                 selected_row = user_addrs.iloc[addr_options.index(chosen_addr_title)]
                 selected_address_info = {
-                    "city": selected_row["city"],
-                    "district": selected_row["district"],
-                    "neighborhood": selected_row["neighborhood"],
-                    "postal_code": selected_row["postal_code"],
-                    "detail": selected_row["detail"],
-                    "phone": selected_row["phone"]
+                    "city": selected_row["city"], "district": selected_row["district"],
+                    "neighborhood": selected_row["neighborhood"], "postal_code": selected_row["postal_code"],
+                    "detail": selected_row["detail"], "phone": selected_row["phone"]
                 }
 
         if user_addrs.empty or chosen_addr_title == "Yeni Adres Gir...":
@@ -469,19 +498,14 @@ if len(st.session_state.cart) > 0:
 
             if ship_phone and ship_neighborhood and ship_address_detail:
                 selected_address_info = {
-                    "city": ship_city,
-                    "district": ship_district,
-                    "neighborhood": ship_neighborhood,
-                    "postal_code": ship_postal,
-                    "detail": ship_address_detail,
-                    "phone": ship_phone
+                    "city": ship_city, "district": ship_district, "neighborhood": ship_neighborhood,
+                    "postal_code": ship_postal, "detail": ship_address_detail, "phone": ship_phone
                 }
 
         if st.sidebar.button("Siparişi Tamamla ve Onayla", key="btn_confirm_order"):
             if not selected_address_info:
                 st.sidebar.error("Lütfen eksiksiz bir teslimat adresi belirtin veya kayıtlı adres seçin.")
             else:
-                # Stok kontrolü (sipariş anında tekrar doğrula)
                 product_df = load_products()
                 stock_problem = False
                 for item in st.session_state.cart:
@@ -494,26 +518,16 @@ if len(st.session_state.cart) > 0:
                     order_id = uuid.uuid4().hex[:8].upper()
                     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-                    # Stokları düş
                     for item in st.session_state.cart:
-                        product_df.loc[product_df["id"] == item["id"], "stock"] -= item["qty"]
-                    product_df.to_csv(CSV_FILE, index=False)
+                        run_query("UPDATE products SET stock = stock - ? WHERE id = ?", (item["qty"], item["id"]))
 
-                    # Siparişi kaydet
-                    orders_df = load_orders()
-                    new_order = pd.DataFrame([{
-                        "order_id": order_id,
-                        "timestamp": timestamp,
-                        "user_email": st.session_state.user_email,
-                        "user_name": st.session_state.user_name,
-                        "items_json": json.dumps(st.session_state.cart, ensure_ascii=False),
-                        "total": total_price,
-                        "address_json": json.dumps(selected_address_info, ensure_ascii=False),
-                        "status": "Alındı"
-                    }])
-                    pd.concat([orders_df, new_order], ignore_index=True).to_csv(ORDERS_FILE, index=False)
+                    run_query(
+                        "INSERT INTO orders (order_id, timestamp, user_email, user_name, items_json, total, address_json, status) VALUES (?,?,?,?,?,?,?,?)",
+                        (order_id, timestamp, st.session_state.user_email, st.session_state.user_name,
+                         json.dumps(st.session_state.cart, ensure_ascii=False), total_price,
+                         json.dumps(selected_address_info, ensure_ascii=False), "Alındı")
+                    )
 
-                    # Mail içeriği
                     order_summary = f"""Sayın {st.session_state.user_name},
 
 YARENART mağazasından verdiğiniz sipariş başarıyla alınmıştır!
@@ -591,17 +605,12 @@ for i in range(0, total_slots, num_cols):
                         new_p = st.number_input("Fiyat Güncelle (TL)", value=float(row['price']), key=f"p_{row['id']}")
                         new_stock = st.number_input("Stok Güncelle", min_value=0, value=int(row['stock']), key=f"s_{row['id']}")
                         if st.button("Değişiklikleri Kaydet", key=f"save_p_{row['id']}"):
-                            product_df = load_products()
-                            product_df.loc[product_df['id'] == row['id'], 'price'] = new_p
-                            product_df.loc[product_df['id'] == row['id'], 'stock'] = new_stock
-                            product_df.to_csv(CSV_FILE, index=False)
+                            run_query("UPDATE products SET price = ?, stock = ? WHERE id = ?", (new_p, new_stock, row['id']))
                             st.success("Ürün güncellendi!")
                             st.rerun()
 
                         if st.button("🗑️ Ürünü Kaldır", key=f"del_{row['id']}"):
-                            product_df = load_products()
-                            product_df = product_df[product_df['id'] != row['id']]
-                            product_df.to_csv(CSV_FILE, index=False)
+                            run_query("DELETE FROM products WHERE id = ?", (row['id'],))
                             st.warning("Ürün silindi!")
                             st.rerun()
 
@@ -632,24 +641,20 @@ for i in range(0, total_slots, num_cols):
 
                     submitted_slot = st.form_submit_button("Vitrine Ekle 🚀")
                     if submitted_slot:
-                        product_df = load_products()
-                        new_id = int(product_df["id"].max() + 1) if not product_df.empty else 1
-
                         final_image_path = n_img_url
-                        if image_mode == "Bilgisayardan Yükle" and n_img_file is not None:
-                            ext = os.path.splitext(n_img_file.name)[1]
-                            saved_path = os.path.join(UPLOAD_DIR, f"product_{new_id}{ext}")
-                            with open(saved_path, "wb") as f:
-                                f.write(n_img_file.getbuffer())
-                            final_image_path = saved_path
-
-                        if n_title and final_image_path:
-                            new_row = pd.DataFrame([{
-                                "id": new_id, "title": n_title, "category": n_cat,
-                                "price": n_price, "stock": n_stock, "description": n_desc, "image_url": final_image_path
-                            }])
-                            updated_df = pd.concat([product_df, new_row], ignore_index=True)
-                            updated_df.to_csv(CSV_FILE, index=False)
+                        new_id = None
+                        if n_title and (n_img_file is not None or n_img_url):
+                            new_id = run_query(
+                                "INSERT INTO products (title, category, price, stock, description, image_url) VALUES (?,?,?,?,?,?)",
+                                (n_title, n_cat, n_price, n_stock, n_desc, "")
+                            )
+                            if image_mode == "Bilgisayardan Yükle" and n_img_file is not None:
+                                ext = os.path.splitext(n_img_file.name)[1]
+                                saved_path = os.path.join(UPLOAD_DIR, f"product_{new_id}{ext}")
+                                with open(saved_path, "wb") as f:
+                                    f.write(n_img_file.getbuffer())
+                                final_image_path = saved_path
+                            run_query("UPDATE products SET image_url = ? WHERE id = ?", (final_image_path, new_id))
                             st.success("Yeni ürün vitrine eklendi!")
                             st.rerun()
                         else:
