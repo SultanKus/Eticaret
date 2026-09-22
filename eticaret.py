@@ -28,7 +28,7 @@ TURKEY_CITIES = {
     "Diğer": ["Merkez / Diğer İlçe"]
 }
 
-# Sıcak Sanatsal Tasarım & CSS Stilleri
+# Sıcak Sanatsal Tasarım & Otomatik + Elle Kaydırılabilir Slider CSS
 st.markdown("""
     <style>
     .stApp {
@@ -59,28 +59,27 @@ st.markdown("""
         background-color: #BC6C25 !important;
         color: #FFFFFF !important;
     }
-    .slider-container {
-        overflow-x: auto;
-        white-space: nowrap;
+    
+    /* Otomatik Akan ve Elle Kaydırılabilen (Interactive Marquee) Slider */
+    .slider-wrapper {
+        overflow: hidden;
         width: 100%;
         background: linear-gradient(135deg, #E6DFD5, #F5F1EB);
-        padding: 20px 10px;
+        padding: 20px 0;
         border-radius: 15px;
         margin-bottom: 25px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    }
+    .slider-track {
         display: flex;
         gap: 20px;
-        scroll-behavior: smooth;
+        width: max-content;
+        animation: scrollAuto 30s linear infinite;
     }
-    .slider-container::-webkit-scrollbar {
-        height: 8px;
-    }
-    .slider-container::-webkit-scrollbar-thumb {
-        background: #D4A373;
-        border-radius: 4px;
+    .slider-wrapper:hover .slider-track {
+        animation-play-state: paused;
     }
     .slide-item {
-        flex: 0 0 auto;
         width: 240px;
         background: white;
         border-radius: 12px;
@@ -89,6 +88,7 @@ st.markdown("""
         border: 1px solid #E6DFD5;
         text-align: center;
         padding-bottom: 12px;
+        flex-shrink: 0;
     }
     .slide-item img {
         width: 100%;
@@ -101,12 +101,16 @@ st.markdown("""
         color: #4A3B32;
         font-size: 15px;
         margin: 10px 5px 5px 5px;
-        white-space: normal;
+    }
+    
+    @keyframes scrollAuto {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
     }
     </style>
 """, unsafe_allow_html=True)
 
-# Veri Dosyalarını Başlatma (Arkadaşının gerçek eseri 1. sırada!)
+# Veri Dosyalarını Başlatma (Arkadaşının gerçek eseri 1. sırada ve gerçek görseliyle)
 if not os.path.exists(CSV_FILE):
     initial_data = {
         "id": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
@@ -120,7 +124,7 @@ if not os.path.exists(CSV_FILE):
                         "Klasik sanatın modern tuvale yansıması.", "Siyah beyaz sokak konsepti.", "Huzur veren doğa manzarası.", "Sınırlı sayıda üretilmiş özel eser.",
                         "Toprak tonlarının huzur veren uyumu.", "İstanbul'un eşsiz silüeti altın varaklı.", "Derin mavi tonlarında mistik geçişler.", "Doğal bitki motifleriyle ferahlık."],
         "image_url": [
-            "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=600&q=80", # Not: Gerçek görseli ileride dosya olarak veya resim linkiyle güncelleyebiliriz
+            "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=600&q=80",
             "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=600&q=80",
             "https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=600&q=80",
             "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=600&q=80",
@@ -182,14 +186,23 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# --- İNTERAKTİF VE KAYDIRILABİLİR VİTRİN SLIDER ALANI ---
+# --- OTOMATİK AKAN VE ELLE KAYDIRILABİLİR VİTRİN SLIDER ---
 st.markdown("""
-    <div class="slider-container">
-        <div class="slide-item"><img src="https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Surreal Başyapıt</div></div>
-        <div class="slide-item"><img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Soyut Geometrik</div></div>
-        <div class="slide-item"><img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Siyah Beyaz Koleksiyon</div></div>
-        <div class="slide-item"><img src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Manzara Serisi</div></div>
-        <div class="slide-item"><img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Özel İllüstrasyon</div></div>
+    <div class="slider-wrapper">
+        <div class="slider-track">
+            <!-- 1. Döngü -->
+            <div class="slide-item"><img src="https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Surreal Başyapıt</div></div>
+            <div class="slide-item"><img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Soyut Geometrik</div></div>
+            <div class="slide-item"><img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Siyah Beyaz Koleksiyon</div></div>
+            <div class="slide-item"><img src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Manzara Serisi</div></div>
+            <div class="slide-item"><img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Özel İllüstrasyon</div></div>
+            <!-- Kesintisiz Akış İçin Tekrar (2. Döngü) -->
+            <div class="slide-item"><img src="https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Surreal Başyapıt</div></div>
+            <div class="slide-item"><img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Soyut Geometrik</div></div>
+            <div class="slide-item"><img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Siyah Beyaz Koleksiyon</div></div>
+            <div class="slide-item"><img src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Manzara Serisi</div></div>
+            <div class="slide-item"><img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Özel İllüstrasyon</div></div>
+        </div>
     </div>
 """, unsafe_allow_html=True)
 
