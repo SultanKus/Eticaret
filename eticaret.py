@@ -32,7 +32,7 @@ TURKEY_CITIES = {
     "Diğer": ["Merkez / Diğer İlçe"]
 }
 
-# Sıcak Sanatsal Tasarım & CSS Stilleri
+# Sıcak Sanatsal Tasarım & Shopify Tarzı Kart Stilleri
 st.markdown("""
     <style>
     .stApp {
@@ -114,23 +114,17 @@ st.markdown("""
 # Veri Dosyalarını Başlatma
 if not os.path.exists(CSV_FILE):
     initial_data = {
-        "id": [1, 2, 3, 4, 5, 6, 7, 8],
-        "title": ["Surreal Bakış & Rüya Odası", "Modern Soyut Geometrik Tablo", "Lacivert Krem Soyut Tablo", "Siyah Bej Altın Soyut Tablo", 
-                  "Baş Yapıt Kanvas Tablo", "Siyah Beyaz Kanvas Tablo", "Manzara Kanvas Tablosu", "Özel Seri İllüstrasyon"],
-        "category": ["Baş Yapıt", "Soyut Kanvas", "Soyut Kanvas", "Soyut Kanvas", "Baş Yapıt", "Siyah Beyaz", "Manzara", "Özel Seri"],
-        "price": [2500.0, 1000.0, 1150.0, 1200.0, 1450.0, 850.0, 1100.0, 1500.0],
-        "stock": [1, 3, 5, 2, 4, 1, 6, 2],
-        "description": ["Sanatçının elinden çıkan orijinal başyapıt[cite: 5].", "Yüksek kaliteli tuval üzerine özel modern tasarım.", "Evinize şıklık katacak renk tonları.", "Altın varak detaylı lüks dokunuş.",
-                        "Klasik sanatın modern tuvale yansıması.", "Siyah beyaz sokak konsepti.", "Huzur veren doğa manzarası.", "Sınırlı sayıda üretilmiş özel eser."],
+        "id": [1, 2, 3, 4],
+        "title": ["Surreal Bakış & Rüya Odası", "Soyut Düşler (Tuval Baskı)", "Suluboya Botanik Serisi", "Portre Çalışması - 01"],
+        "category": ["Baş Yapıt", "Baskı", "Suluboya", "Portre"],
+        "price": [2500.0, 450.0, 350.0, 900.0],
+        "stock": [1, 5, 4, 2],
+        "description": ["Sanatçının elinden çıkan orijinal başyapıt[cite: 5].", "Yüksek kaliteli mat kuşe kağıda sınırlı sayıdaki imzalı baskı.", "Özel suluboya kağıdı üzerine el yapımı botanik illüstrasyon.", "Detaylı portre çalışması."],
         "image_url": [
             "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=600&q=80",
             "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=600&q=80",
             "https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=600&q=80",
-            "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=600&q=80",
-            "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=600&q=80",
-            "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=600&q=80",
-            "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=600&q=80",
-            "https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=600&q=80"
+            "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=600&q=80"
         ]
     }
     pd.DataFrame(initial_data).to_csv(CSV_FILE, index=False)
@@ -185,11 +179,9 @@ st.markdown("""
     <div class="slider-wrapper">
         <div class="slider-track">
             <div class="slide-item"><img src="https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Surreal Başyapıt</div></div>
-            <div class="slide-item"><img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Soyut Geometrik</div></div>
-            <div class="slide-item"><img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Siyah Beyaz Koleksiyon</div></div>
-            <div class="slide-item"><img src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Manzara Serisi</div></div>
-            <div class="slide-item"><img src="https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Surreal Başyapıt</div></div>
-            <div class="slide-item"><img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Soyut Geometrik</div></div>
+            <div class="slide-item"><img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Soyut Düşler</div></div>
+            <div class="slide-item"><img src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Botanik Serisi</div></div>
+            <div class="slide-item"><img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Portre Çalışması</div></div>
         </div>
     </div>
 """, unsafe_allow_html=True)
@@ -352,83 +344,101 @@ Sipariş Edilen Ürünler:
                 st.balloons()
                 st.session_state.cart = []
             else:
-                st.sidebar.error("Lütfen eksiksiz bir teslimat adresi belirtin veya kayıtල් adres seçin.")
+                st.sidebar.error("Lütfen eksiksiz bir teslimat adresi belirtin veya kayıtlı adres seçin.")
 else:
     st.sidebar.write("Sepetiniz boş.")
 
-# --- ANA EKRAN: VİTRİN VE DOĞRUDAN YÖNETİM ---
-col_head1, col_head2 = st.columns([3, 1])
-with col_head1:
-    st.markdown("### 🎨 Tüm Sanat Eserleri")
-with col_head2:
-    selected_cat = st.selectbox("Kategori Filtrele", ["Tümü", "Soyut Kanvas", "Baş Yapıt", "Siyah Beyaz", "Manzara", "Özel Seri"], key="filter_cat")
-
-# --- YALNIZCA SANA ÖZEL: VİTRİN ÜZERİNDE HIZLI YÖNETİCİ PANELİ ---
-if st.session_state.logged_in and st.session_state.user_email == ADMIN_EMAIL:
-    with st.expander("🛠️ [ADMIN ÖZEL] Vitrine Hızlı Yeni Eser Ekle", expanded=False):
-        with st.form("quick_add_form"):
-            q_title = st.text_input("Eser Adı")
-            q_cat = st.selectbox("Kategori", ["Soyut Kanvas", "Baş Yapıt", "Siyah Beyaz", "Manzara", "Özel Seri"], key="q_cat")
-            q_price = st.number_input("Fiyat (TL)", min_value=0.0, value=1200.0)
-            q_stock = st.number_input("Stok", min_value=1, value=1)
-            q_desc = st.text_area("Açıklama")
-            q_img_url = st.text_input("Görsel URL (Unsplash veya Resim Linki)")
-            
-            submitted = st.form_submit_button("Vitrine Ekle")
-            if submitted:
-                if q_title and q_img_url:
-                    product_df = load_products()
-                    new_id = int(product_df["id"].max() + 1) if not product_df.empty else 1
-                    new_row = pd.DataFrame([{
-                        "id": new_id, "title": q_title, "category": q_cat,
-                        "price": q_price, "stock": q_stock, "description": q_desc, "image_url": q_img_url
-                    }])
-                    updated_df = pd.concat([product_df, new_row], ignore_index=True)
-                    updated_df.to_csv(CSV_FILE, index=False)
-                    st.success(f"'{q_title}' başarıyla vitrine eklendi! Sayfa güncelleniyor...")
-                    st.rerun()
-                else:
-                    st.warning("Eser adı ve görsel URL zorunludur.")
+# --- ANA EKRAN: VİTRİN VE SHOPIFY / İKAS TARZI YÖNETİM KARTLARI ---
+st.markdown("### 🎨 Tüm Sanat Eserleri")
+selected_cat = st.selectbox("Kategoriye Göre Filtrele", ["Tümü", "Soyut Kanvas", "Baş Yapıt", "Siyah Beyaz", "Manzara", "Özel Seri", "Baskı", "Suluboya", "Portre"], key="filter_cat")
 
 if selected_cat != "Tümü":
     display_df = df[df["category"] == selected_cat]
 else:
     display_df = df
 
-# 4'LÜ VİTRİN KARTLARI VE KART ÜZERİNDE ADMIN KONTROLÜ (DÜZENLE / SİL)
-num_cols = 4
-rows = [display_df.iloc[i:i+num_cols] for i in range(0, len(display_df), num_cols)]
+# Ürünleri listelemek için ürün listesini dönüştürelim
+products_list = display_df.to_dict('records')
 
-for row_chunk in rows:
+# Eğer Admin isen, listenin sonuna boş bir "Yeni Ürün Ekle" kartı (ikonu/slotu) ekleyelim
+is_admin = st.session_state.logged_in and st.session_state.user_email == ADMIN_EMAIL
+
+# 4'lü sütun yapısı ile ürünleri ve en sonda artı (+) kutusunu basalım
+total_slots = len(products_list) + (1 if is_admin else 0)
+num_cols = 4
+
+for i in range(0, total_slots, num_cols):
     cols = st.columns(num_cols)
-    for col_idx, (_, row) in enumerate(row_chunk.iterrows()):
-        with cols[col_idx]:
-            st.image(row["image_url"], use_container_width=True)
-            st.markdown(f"**{row['title']}**")
-            st.markdown(f"<span style='color: #8C7A6B;'>Kategori: {row['category']}</span>", unsafe_allow_html=True)
-            st.markdown(f"**Fiyat: {row['price']:,.2f} TL**")
-            st.write(row["description"])
-            
-            # Müşteri İçin Sepete Ekle Butonu
-            if st.button("Sepete Ekle", key=f"product_{row['id']}"):
-                st.session_state.cart.append({
-                    "id": row["id"],
-                    "title": row["title"],
-                    "price": row["price"]
-                })
-                st.success("Sepete eklendi!")
-            
-            # --- ADMIN İSEN HER ÜRÜNÜN ALTINDA YÖNETİM BUTONLARI ---
-            if st.session_state.logged_in and st.session_state.user_email == ADMIN_EMAIL:
-                st.markdown("---")
-                col_del, col_edit = st.columns(2)
-                with col_del:
-                    if st.button("🗑️ Sil", key=f"del_{row['id']}"):
-                        product_df = load_products()
-                        product_df = product_df[product_df["id"] != row["id"]]
-                        product_df.to_csv(CSV_FILE, index=False)
-                        st.warning(f"'{row['title']}' silindi!")
-                        st.rerun()
+    for col_idx in range(num_cols):
+        item_index = i + col_idx
+        if item_index < len(products_list):
+            row = products_list[item_index]
+            with cols[col_idx]:
+                st.image(row["image_url"], use_container_width=True)
+                st.markdown(f"**{row['title']}**")
+                st.markdown(f"<span style='color: #8C7A6B;'>Kategori: {row['category']}</span>", unsafe_allow_html=True)
+                st.markdown(f"**Fiyat: {row['price']:,.2f} TL**")
+                
+                # Müşteri İçin Sepete Ekle
+                if st.button("Sepete Ekle", key=f"product_{row['id']}"):
+                    st.session_state.cart.append({
+                        "id": row['id'],
+                        "title": row['title'],
+                        "price": row['price']
+                    })
+                    st.success("Sepete eklendi!")
+                
+                # --- ADMIN İSEN KART ÜZERİNDE HIZLI DÜZENLEME VE SİLME ---
+                if is_admin:
+                    with st.expander(f"⚙️ Yönet: {row['title']}"):
+                        new_p = st.number_input("Fiyat Güncelle (TL)", value=float(row['price']), key=f"p_{row['id']}")
+                        if st.button("Fiyatı Kaydet", key=f"save_p_{row['id']}"):
+                            product_df = load_products()
+                            product_df.loc[product_df['id'] == row['id'], 'price'] = new_p
+                            product_df.to_csv(CSV_FILE, index=False)
+                            st.success("Fiyat güncellendi!")
+                            st.rerun()
+                        
+                        if st.button("🗑️ Ürünü Kaldır", key=f"del_{row['id']}"):
+                            product_df = load_products()
+                            product_df = product_df[product_df['id'] != row['id']]
+                            product_df.to_csv(CSV_FILE, index=False)
+                            st.warning("Ürün silindi!")
+                            st.rerun()
+
+        elif is_admin and item_index == len(products_list):
+            # --- İŞTE GÖNDERDİĞİN ÇİZİMDEKİ O BOŞ ARTI (+) KUTUSU / SLOTU ---
+            with cols[col_idx]:
+                st.markdown("""
+                    <div style='border: 2px dashed #D4A373; border-radius: 12px; padding: 40px 10px; text-align: center; background-color: #FAF6F0; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;'>
+                        <h1 style='color: #D4A373; margin: 0; font-size: 40px;'>+</h1>
+                        <p style='color: #8C7A6B; font-weight: bold; margin-top: 10px;'>Yeni Ürün Ekle</p>
+                    </div>
+                """, unsafe_allow_html=True)
+                
+                # Tıklandığında direkt hızlı ürün ekleme formu açılsın
+                with st.form(key=f"add_slot_form_{item_index}"):
+                    n_title = st.text_input("Eser Adı", placeholder="Tablo adı...")
+                    n_cat = st.selectbox("Kategori", ["Baş Yapıt", "Soyut Kanvas", "Baskı", "Suluboya", "Portre", "Siyah Beyaz", "Manzara"], key="n_cat_box")
+                    n_price = st.number_input("Fiyat (TL)", min_value=0.0, value=1000.0)
+                    n_desc = st.text_input("Kısa Açıklama", placeholder="Örn: Tuval üzerine akrilik...")
+                    n_img = st.text_input("Görsel URL", placeholder="https://...")
+                    
+                    submitted_slot = st.form_submit_button("Vitrine Ekle 🚀")
+                    if submitted_slot:
+                        if n_title and n_img:
+                            product_df = load_products()
+                            new_id = int(product_df["id"].max() + 1) if not product_df.empty else 1
+                            new_row = pd.DataFrame([{
+                                "id": new_id, "title": n_title, "category": n_cat,
+                                "price": n_price, "stock": 1, "description": n_desc, "image_url": n_img
+                            }])
+                            updated_df = pd.concat([product_df, new_row], ignore_index=True)
+                            updated_df.to_csv(CSV_FILE, index=False)
+                            st.success("Yeni ürün vitrine eklendi!")
+                            st.rerun()
+                        else:
+                            st.warning("Eser adı ve görsel URL zorunludur.")
 
 # --- WHATSAPP İKONU VE FOOTER ---
 whatsapp_url = f"https://wa.me/{WHATSAPP_PHONE}?text=Merhaba%2C%20YARENART%20ürünleri%20hakkında%20bilgi%20almak%20istiyorum."
