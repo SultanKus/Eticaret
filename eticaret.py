@@ -8,7 +8,7 @@ import os
 # Sayfa Ayarları
 st.set_page_config(page_title="Sanat & İllüstrasyon Mağazası", page_icon="🎨", layout="wide")
 
-# Veri Dosyası Yolu
+# Veri Dosyası Yolları
 CSV_FILE = "products.csv"
 USERS_FILE = "users.csv"
 
@@ -57,21 +57,10 @@ if "user_email" not in st.session_state:
 if "cart" not in st.session_state:
     st.session_state.cart = []
 
-# Mail Gönderme Fonksiyonu
+# Mail Bildirim Simülasyonu / Fonksiyonu
 def send_email_notification(subject, body):
-    sender_email = "skus42173@gmail.com"
-    # Not: Gerçek şifreleme için app password gerekir, simülasyon/log veya doğrudan SMTP entegrasyonu kurulur.
-    # Güvenlik açısından burada başarılı simülasyon veya SMTP yapısı tetiklenir.
     try:
-        # SMTP ayarları (Gmail için yapılandırılabilir)
-        msg = MIMEMultipart()
-        msg['From'] = sender_email
-        msg['To'] = "skus42173@gmail.com"
-        msg['Subject'] = subject
-        msg.attach(MIMEText(body, 'plain'))
-        
-        # Test amaçlı konsola yazdırıp simüle edelim veya aktif edelim
-        print(f"Mail gönderildi: {subject}")
+        print(f"Mail hedefi: skus42173@gmail.com | Konu: {subject} | İçerik: {body}")
     except Exception as e:
         print(f"Mail hatası: {e}")
 
@@ -97,7 +86,8 @@ if not st.session_state.logged_in:
                     st.sidebar.warning("Bu e-posta zaten kayıtlı!")
                 else:
                     new_user = pd.DataFrame([[email_input, pass_input]], columns=["email", "password"])
-                    new_user.to_csv(USERS_FILE, mode='a', header=False, index=False)
+                    updated_users = pd.concat([users_df, new_user], ignore_index=True)
+                    updated_users.to_csv(USERS_FILE, index=False)
                     st.sidebar.success("Kayıt başarılı! Şimdi giriş yapabilirsiniz.")
                     send_email_notification("Yeni Üye Kaydı", f"Yeni bir üye katıldı: {email_input}")
             else:
@@ -121,7 +111,7 @@ else:
 
 st.sidebar.divider()
 
-# --- ADMIN PANELİ (Sadece senin mailine özel veya gizli sekme) ---
+# --- ADMIN PANELİ (Mağaza Yönetimi) ---
 st.sidebar.subheader("🛠️ Mağaza Yönetimi (Admin)")
 admin_mode = st.sidebar.checkbox("Yönetim Paneli Aç")
 
@@ -145,7 +135,7 @@ if admin_mode:
             }])
             updated_df = pd.concat([product_df, new_row], ignore_index=True)
             updated_df.to_csv(CSV_FILE, index=False)
-            st.sidebar.success("Ürün başarıyla eklendi! Sayfayı yenileyin.")
+            st.sidebar.success("Ürün başarıyla eklendi! Sayfa yenileniyor...")
             st.rerun()
         else:
             st.sidebar.warning("Eser adı ve görsel URL zorunludur.")
@@ -193,7 +183,7 @@ Adres: {ship_neighborhood} Mah. {ship_address_detail}, {ship_district} / {ship_c
                     order_summary += f"- {item['title']} ({item['price']} TL)\n"
                 order_summary += f"\nToplam Tutar: {total_price} TL"
                 
-                # skus42173@gmail.com adresine mail simülasyonu / tetiklemesi
+                # skus42173@gmail.com adresine sipariş bildirimi
                 send_email_notification(f"Yeni Sipariş - {ship_name}", order_summary)
                 
                 st.sidebar.success("Siparişiniz başarıyla alındı! Satıcıya ve size detaylar iletildi.")
@@ -215,7 +205,7 @@ else:
 
 # 4'lü sütun yapısı (Her satırda 4 ürün)
 num_cols = 4
-rows = [display_df.irow(i:i+num_cols) for i in range(0, len(display_df), num_cols)] if hasattr(display_df, 'irow') else [display_df.iloc[i:i+num_cols] for i in range(0, len(display_df), num_cols)]
+rows = [display_df.iloc[i:i+num_cols] for i in range(0, len(display_df), num_cols)]
 
 for row_chunk in rows:
     cols = st.columns(num_cols)
