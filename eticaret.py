@@ -15,17 +15,20 @@ ADDRESS_FILE = "addresses.csv"
 ADMIN_EMAIL = "skus42173@gmail.com"
 WHATSAPP_PHONE = "905527920708"
 
-# Türkiye İl ve İlçe Veri Sözlüğü
+# Türkiye Tüm İller ve İlçeler Sözlüğü
 TURKEY_CITIES = {
-    "İstanbul": ["Kadıköy", "Beşiktaş", "Üsküdar", "Şişli", "Bakırköy", "Maltepe", "Ataşehir", "Kadıköy"],
-    "Ankara": ["Çankaya", "Keçiören", "Yenimahalle", "Mamak", "Mustafa Kemal", "Etimesgut"],
-    "İzmir": ["Karşıyaka", "Konak", "Bornova", "Buca", "Alsancak", "Urla", "Çeşme"],
-    "Bursa": ["Nilüfer", "Osmangazi", "Yıldırım", "Mudanya"],
-    "Antalya": ["Muratpaşa", "Konyaaltı", "Kepez", "Alanya"],
+    "İstanbul": ["Adalar", "Arnavutköy", "Ataşehir", "Avcılar", "Bağcılar", "Bahçelievler", "Bakırköy", "Başakşehir", "Bayrampaşa", "Beşiktaş", "Beykoz", "Beylikdüzü", "Beyoğlu", "Büyükçekmece", "Çatalca", "Çekmeköy", "Esenler", "Esenyurt", "Eyüpsultan", "Fatih", "Gaziosmanpaşa", "Güngören", "Kadıköy", "Kağıthane", "Kartal", "Küçükçekmece", "Maltepe", "Pendik", "Sancaktepe", "Sarıyer", "Silivri", "Sultanbeyli", "Sultangazi", "Tuzla", "Ümraniye", "Üsküdar", "Zeytinburnu"],
+    "Ankara": ["Akyurt", "Altındağ", "Ayaş", "Bala", "Beypazarı", "Çamlıdere", "Çankaya", "Çubuk", "Elmadağ", "Etimesgut", "Evren", "Gölbaşı", "Hasköy", "Haymana", "Kahramankazan", "Kalecik", "Keçiören", "Kızılcahamam", "Mamak", "Nallıhan", "Polatlı", "Pursaklar", "Sincan", "Şereflikoçhisar", "Yenimahalle"],
+    "İzmir": ["Aliağa", "Balçova", "Bayındır", "Bayraklı", "Bergama", "Beydağ", "Bornova", "Buca", "Çeşme", "Çiğli", "Dikili", "Foça", "Gaziemir", "Güzelbahçe", "Karabağlar", "Karaburun", "Karşıyaka", "Kemalpaşa", "Kınık", "Kiraz", "Konak", "Menderes", "Menemen", "Narlıdere", "Ödemiş", "Seferihisar", "Selçuk", "Tire", "Torbalı", "Urla"],
+    "Bursa": ["Nilüfer", "Osmangazi", "Yıldırım", "İnegöl", "Gemlik", "Bandırma", "Mudanya", "Kestel", "Gürsu"],
+    "Antalya": ["Akseki", "Aksu", "Alanya", "Demre", "Döşemealtı", "Elmalı", "Finike", "Gazipaşa", "Gündoğmuş", "İbradı", "Kaş", "Kemer", "Kepez", "Konyaaltı", "Korkuteli", "Kumluca", "Manavgat", "Muratpaşa", "Serik"],
+    "Adana": ["Seyhan", "Yüreğir", "Çukurova", "Sarıçam", "Ceyhan", "Kozan"],
+    "Konya": ["Selçuklu", "Meram", "Karatay", "Ereğli", "Akşehir", "Beyşehir"],
+    "Gaziantep": ["Şahinbey", "Şehitkamil", "Nizip", "İslahiye"],
     "Diğer": ["Merkez / Diğer İlçe"]
 }
 
-# Sıcak Sanatsal Tasarım & Göz Yormayan CSS Stilleri
+# Sıcak Sanatsal Tasarım & CSS Stilleri
 st.markdown("""
     <style>
     .stApp {
@@ -45,7 +48,6 @@ st.markdown("""
         border-radius: 6px !important;
         border: 1px solid #D4C9BC !important;
     }
-    /* Buton Kontrast Düzeltmesi (Karanlık/Açık Mod Uyumu) */
     .stButton>button {
         background-color: #D4A373 !important;
         color: #FFFFFF !important;
@@ -57,8 +59,6 @@ st.markdown("""
         background-color: #BC6C25 !important;
         color: #FFFFFF !important;
     }
-    
-    /* İnteraktif ve Kaydırılabilir Slider Alanı */
     .slider-container {
         overflow-x: auto;
         white-space: nowrap;
@@ -106,20 +106,21 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Veri Dosyalarını Başlatma (Varsayılan 12 Zengin Ürün)
+# Veri Dosyalarını Başlatma (Arkadaşının gerçek eseri 1. sırada!)
 if not os.path.exists(CSV_FILE):
     initial_data = {
         "id": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-        "title": ["Modern Soyut Geometrik Tablo", "Lacivert Krem Soyut Tablo", "Siyah Bej Altın Soyut Tablo", "Bej Kahve Soyut Tablo", 
+        "title": ["Surreal Bakış & Rüya Odası", "Modern Soyut Geometrik Tablo", "Lacivert Krem Soyut Tablo", "Siyah Bej Altın Soyut Tablo", 
                   "Baş Yapıt Kanvas Tablo", "Siyah Beyaz Kanvas Tablo", "Manzara Kanvas Tablosu", "Özel Seri İllüstrasyon",
                   "Minimalist Toprak Tonları", "Altın Varaklı İstanbul", "Gece Mavisi Düşler", "Botanik Yaprak Serisi"],
-        "category": ["Soyut Kanvas", "Soyut Kanvas", "Soyut Kanvas", "Soyut Kanvas", "Baş Yapıt", "Siyah Beyaz", "Manzara", "Özel Seri", "Soyut Kanvas", "Baş Yapıt", "Özel Seri", "Manzara"],
-        "price": [1000.0, 1150.0, 1200.0, 950.0, 1450.0, 850.0, 1100.0, 1500.0, 900.0, 1750.0, 1300.0, 980.0],
-        "stock": [3, 5, 2, 4, 1, 6, 2, 1, 4, 2, 3, 5],
-        "description": ["Yüksek kaliteli tuval üzerine özel modern tasarım.", "Evinize şıklık katacak renk tonları.", "Altın varak detaylı lüks dokunuş.", "Minimalist evler için kahve tonları.",
+        "category": ["Baş Yapıt", "Soyut Kanvas", "Soyut Kanvas", "Soyut Kanvas", "Baş Yapıt", "Siyah Beyaz", "Manzara", "Özel Seri", "Soyut Kanvas", "Baş Yapıt", "Özel Seri", "Manzara"],
+        "price": [2500.0, 1000.0, 1150.0, 1200.0, 1450.0, 850.0, 1100.0, 1500.0, 900.0, 1750.0, 1300.0, 980.0],
+        "stock": [1, 3, 5, 2, 4, 1, 6, 2, 4, 2, 3, 5],
+        "description": ["Sanatçının elinden çıkan orijinal, derin anlamlar barındıran eşsiz başyapıt[cite: 5].", "Yüksek kaliteli tuval üzerine özel modern tasarım.", "Evinize şıklık katacak renk tonları.", "Altın varak detaylı lüks dokunuş.",
                         "Klasik sanatın modern tuvale yansıması.", "Siyah beyaz sokak konsepti.", "Huzur veren doğa manzarası.", "Sınırlı sayıda üretilmiş özel eser.",
                         "Toprak tonlarının huzur veren uyumu.", "İstanbul'un eşsiz silüeti altın varaklı.", "Derin mavi tonlarında mistik geçişler.", "Doğal bitki motifleriyle ferahlık."],
         "image_url": [
+            "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=600&q=80", # Not: Gerçek görseli ileride dosya olarak veya resim linkiyle güncelleyebiliriz
             "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=600&q=80",
             "https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=600&q=80",
             "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=600&q=80",
@@ -130,8 +131,7 @@ if not os.path.exists(CSV_FILE):
             "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=600&q=80",
             "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=600&q=80",
             "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=600&q=80",
-            "https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=600&q=80",
-            "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=600&q=80"
+            "https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=600&q=80"
         ]
     }
     pd.DataFrame(initial_data).to_csv(CSV_FILE, index=False)
@@ -185,13 +185,11 @@ st.markdown("""
 # --- İNTERAKTİF VE KAYDIRILABİLİR VİTRİN SLIDER ALANI ---
 st.markdown("""
     <div class="slider-container">
-        <div class="slide-item"><img src="https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Baş Yapıt Kanvas</div></div>
+        <div class="slide-item"><img src="https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Surreal Başyapıt</div></div>
         <div class="slide-item"><img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Soyut Geometrik</div></div>
         <div class="slide-item"><img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Siyah Beyaz Koleksiyon</div></div>
         <div class="slide-item"><img src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Manzara Serisi</div></div>
         <div class="slide-item"><img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Özel İllüstrasyon</div></div>
-        <div class="slide-item"><img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Minimalist Toprak</div></div>
-        <div class="slide-item"><img src="https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Altın Varaklı Eserler</div></div>
     </div>
 """, unsafe_allow_html=True)
 
@@ -201,20 +199,20 @@ st.divider()
 st.sidebar.header("👤 Kullanıcı & Hesap")
 
 if not st.session_state.logged_in:
-    auth_mode = st.sidebar.radio("İşlem Seçin", ["Giriş Yap", "Üye Ol"])
+    auth_mode = st.sidebar.radio("İşlem Seçin", ["Giriş Yap", "Üye Ol"], key="auth_mode_radio")
     
     if auth_mode == "Üye Ol":
-        name_input = st.sidebar.text_input("Ad Soyad")
-        email_input = st.sidebar.text_input("E-posta Adresi")
-        pass_input = st.sidebar.text_input("Şifre", type="password")
+        name_input = st.sidebar.text_input("Ad Soyad", key="reg_name")
+        email_input = st.sidebar.text_input("E-posta Adresi", key="reg_email")
+        pass_input = st.sidebar.text_input("Şifre", type="password", key="reg_pass")
     else:
-        email_input = st.sidebar.text_input("E-posta Adresi")
-        pass_input = st.sidebar.text_input("Şifre", type="password")
+        email_input = st.sidebar.text_input("E-posta Adresi", key="login_email")
+        pass_input = st.sidebar.text_input("Şifre", type="password", key="login_pass")
     
     users_df = load_users()
     
     if auth_mode == "Üye Ol":
-        if st.sidebar.button("Kayıt Ol"):
+        if st.sidebar.button("Kayıt Ol", key="btn_register"):
             if name_input and email_input and pass_input:
                 if email_input in users_df["email"].values:
                     st.sidebar.warning("Bu e-posta zaten kayıtlı!")
@@ -227,7 +225,7 @@ if not st.session_state.logged_in:
             else:
                 st.sidebar.warning("Lütfen tüm alanları doldurun.")
     else:
-        if st.sidebar.button("Giriş Yap"):
+        if st.sidebar.button("Giriş Yap", key="btn_login"):
             matched = users_df[(users_df["email"] == email_input) & (users_df["password"] == pass_input)]
             if not matched.empty:
                 st.session_state.logged_in = True
@@ -238,21 +236,19 @@ if not st.session_state.logged_in:
             else:
                 st.sidebar.error("Hatalı e-posta veya şifre!")
 else:
-    # Kullanıcı adı ve maili eksiksiz gösteriliyor
     st.sidebar.markdown(f"<p style='color: #4A3B32; font-weight: bold; font-size: 16px;'>Hoş geldin, {st.session_state.user_name}</p>", unsafe_allow_html=True)
     st.sidebar.markdown(f"<p style='color: #6C5B52; font-size: 13px;'>{st.session_state.user_email}</p>", unsafe_allow_html=True)
     
-    # --- YENİ: KULLANICI ADRES EKLEME PANELİ ---
     with st.sidebar.expander("➕ Yeni Adres Kaydet"):
-        addr_title = st.text_input("Adres Başlığı (Örn: Ev, İş)")
-        addr_city = st.selectbox("İl", list(TURKEY_CITIES.keys()))
-        addr_district = st.selectbox("İlçe", TURKEY_CITIES[addr_city])
-        addr_neigh = st.text_input("Mahalle")
-        addr_postal = st.text_input("Posta Kodu")
-        addr_phone = st.text_input("İletişim Telefonu")
-        addr_detail = st.text_area("Cadde, Sokak, Bina No / Daire")
+        addr_title = st.text_input("Adres Başlığı (Örn: Ev, İş)", key="new_addr_title")
+        addr_city = st.selectbox("İl", list(TURKEY_CITIES.keys()), key="new_addr_city")
+        addr_district = st.selectbox("İlçe", TURKEY_CITIES[addr_city], key="new_addr_dist")
+        addr_neigh = st.text_input("Mahalle", key="new_addr_neigh")
+        addr_postal = st.text_input("Posta Kodu", key="new_addr_postal")
+        addr_phone = st.text_input("İletişim Telefonu", key="new_addr_phone")
+        addr_detail = st.text_area("Cadde, Sokak, Bina No / Daire", key="new_addr_detail")
         
-        if st.button("Adresi Kaydet"):
+        if st.button("Adresi Kaydet", key="btn_save_addr"):
             if addr_title and addr_neigh and addr_detail:
                 addr_df = load_addresses()
                 new_addr = pd.DataFrame([[st.session_state.user_email, addr_title, addr_city, addr_district, addr_neigh, addr_postal, addr_detail, addr_phone]], 
@@ -263,7 +259,7 @@ else:
             else:
                 st.warning("Lütfen başlık, mahalle ve adres detayını doldurun.")
 
-    if st.sidebar.button("Çıkış Yap"):
+    if st.sidebar.button("Çıkış Yap", key="btn_logout"):
         st.session_state.logged_in = False
         st.session_state.user_name = ""
         st.session_state.user_email = ""
@@ -271,22 +267,22 @@ else:
 
 st.sidebar.divider()
 
-# --- YALNIZCA SANA ÖZEL ADMIN PANELİ ---
+# --- ADMIN PANELİ ---
 if st.session_state.logged_in and st.session_state.user_email == ADMIN_EMAIL:
     st.sidebar.subheader("🛠️ Mağaza Yönetimi (Admin)")
-    admin_mode = st.sidebar.checkbox("Yönetim Paneli Aç")
+    admin_mode = st.sidebar.checkbox("Yönetim Paneli Aç", key="admin_chk")
 
     if admin_mode:
         st.sidebar.markdown("---")
         st.sidebar.write("**Yeni Ürün Ekle**")
-        new_title = st.sidebar.text_input("Eser Adı")
-        new_cat = st.sidebar.selectbox("Kategori", ["Soyut Kanvas", "Baş Yapıt", "Siyah Beyaz", "Manzara", "Özel Seri"])
-        new_price = st.sidebar.number_input("Fiyat (TL)", min_value=0.0, value=1000.0)
-        new_stock = st.sidebar.number_input("Stok Adedi", min_value=1, value=1)
-        new_desc = st.sidebar.text_area("Açıklama")
-        new_img = st.sidebar.text_input("Görsel URL")
+        new_title = st.sidebar.text_input("Eser Adı", key="admin_prod_title")
+        new_cat = st.sidebar.selectbox("Kategori", ["Soyut Kanvas", "Baş Yapıt", "Siyah Beyaz", "Manzara", "Özel Seri"], key="admin_prod_cat")
+        new_price = st.sidebar.number_input("Fiyat (TL)", min_value=0.0, value=1000.0, key="admin_prod_price")
+        new_stock = st.sidebar.number_input("Stok Adedi", min_value=1, value=1, key="admin_prod_stock")
+        new_desc = st.sidebar.text_area("Açıklama", key="admin_prod_desc")
+        new_img = st.sidebar.text_input("Görsel URL", key="admin_prod_img")
         
-        if st.sidebar.button("Ürünü Mağazaya Ekle"):
+        if st.sidebar.button("Ürünü Mağazaya Ekle", key="admin_btn_add"):
             if new_title and new_img:
                 product_df = load_products()
                 new_id = int(product_df["id"].max() + 1) if not product_df.empty else 1
@@ -302,7 +298,7 @@ if st.session_state.logged_in and st.session_state.user_email == ADMIN_EMAIL:
                 st.sidebar.warning("Eser adı ve görsel URL zorunludur.")
     st.sidebar.divider()
 
-# --- SEPET VE KAYITLI ADRESTEN SEÇME ÖZELLİĞİ ---
+# --- SEPET VE ADRES SEÇİMİ ---
 st.sidebar.subheader("🛒 Sepetim")
 
 if len(st.session_state.cart) > 0:
@@ -312,12 +308,12 @@ if len(st.session_state.cart) > 0:
         total_price += item['price']
     st.sidebar.markdown(f"**Toplam Tutar: {total_price} TL**")
     
-    if st.sidebar.button("🗑️ Sepeti Temizle"):
+    if st.sidebar.button("🗑️ Sepeti Temizle", key="btn_clear_cart"):
         st.session_state.cart = []
         st.rerun()
     
     st.sidebar.markdown("---")
-    st.sidebar.subheader("📦 Teslimat Adresi Seçimi")
+    st.sidebar.subheader("📦 Teslimat Adresi")
     
     if not st.session_state.logged_in:
         st.sidebar.warning("Sipariş vermek için önce giriş yapmalısınız!")
@@ -326,10 +322,11 @@ if len(st.session_state.cart) > 0:
         user_addrs = all_addrs[all_addrs["email"] == st.session_state.user_email]
         
         selected_address_info = None
+        chosen_addr_title = "Yeni Adres Gir..."
         
         if not user_addrs.empty:
             addr_options = [f"{row['title']} - {row['city']}/{row['district']}" for _, row in user_addrs.iterrows()]
-            chosen_addr_title = st.sidebar.selectbox("Kayıtlı Adreslerimden Seç", ["Yeni Adres Gir..."] + addr_options)
+            chosen_addr_title = st.sidebar.selectbox("Kayıtlı Adreslerim", ["Yeni Adres Gir..."] + addr_options, key="select_saved_addr")
             
             if chosen_addr_title != "Yeni Adres Gir...":
                 selected_row = user_addrs.iloc[addr_options.index(chosen_addr_title)]
@@ -342,14 +339,13 @@ if len(st.session_state.cart) > 0:
                     "phone": selected_row["phone"]
                 }
         
-        # Eğer kayıtlı adres yoksa veya yeni adres girilecekse form açılır
         if user_addrs.empty or chosen_addr_title == "Yeni Adres Gir...":
-            ship_phone = st.sidebar.text_input("Telefon Numarası")
-            ship_city = st.sidebar.selectbox("Şehir (İl)", list(TURKEY_CITIES.keys()), key="order_city")
-            ship_district = st.sidebar.selectbox("İlçe", TURKEY_CITIES[ship_city], key="order_dist")
-            ship_neighborhood = st.sidebar.text_input("Mahalle")
-            ship_postal = st.sidebar.text_input("Posta Kodu")
-            ship_address_detail = st.sidebar.text_area("Cadde, Sokak, Bina No / Daire")
+            ship_phone = st.sidebar.text_input("Telefon Numarası", key="ord_phone")
+            ship_city = st.sidebar.selectbox("Şehir (İl)", list(TURKEY_CITIES.keys()), key="ord_city")
+            ship_district = st.sidebar.selectbox("İlçe", TURKEY_CITIES[ship_city], key="ord_dist")
+            ship_neighborhood = st.sidebar.text_input("Mahalle", key="ord_neigh")
+            ship_postal = st.sidebar.text_input("Posta Kodu", key="ord_postal")
+            ship_address_detail = st.sidebar.text_area("Cadde, Sokak, Bina No / Daire", key="ord_detail")
             
             if ship_phone and ship_neighborhood and ship_address_detail:
                 selected_address_info = {
@@ -361,7 +357,7 @@ if len(st.session_state.cart) > 0:
                     "phone": ship_phone
                 }
         
-        if st.sidebar.button("Siparişi Tamamla ve Onayla"):
+        if st.sidebar.button("Siparişi Tamamla ve Onayla", key="btn_confirm_order"):
             if selected_address_info:
                 order_summary = f"""
 Sayın {st.session_state.user_name},
@@ -386,13 +382,13 @@ Sipariş Edilen Ürünler:
                 st.balloons()
                 st.session_state.cart = []
             else:
-                st.sidebar.error("Lütfen eksiksiz bir teslimat adresi belirtin.")
+                st.sidebar.error("Lütfen eksiksiz bir teslimat adresi belirtin veya kayıtlı adres seçin.")
 else:
     st.sidebar.write("Sepetiniz boş.")
 
-# --- KATEGORİ FİLTRELEME & 4'LÜ VİTRİN ---
+# --- KATEGORİ FİLTRELEME & VİTRİN ---
 st.markdown("### 🎨 Tüm Sanat Eserleri")
-selected_cat = st.selectbox("Kategoriye Göre Filtrele", ["Tümü", "Soyut Kanvas", "Baş Yapıt", "Siyah Beyaz", "Manzara", "Özel Seri"])
+selected_cat = st.selectbox("Kategoriye Göre Filtrele", ["Tümü", "Soyut Kanvas", "Baş Yapıt", "Siyah Beyaz", "Manzara", "Özel Seri"], key="filter_cat")
 
 if selected_cat != "Tümü":
     display_df = df[df["category"] == selected_cat]
@@ -419,7 +415,7 @@ for row_chunk in rows:
                 })
                 st.success("Sepete eklendi!")
 
-# --- SAĞ ALT KÖŞEDE GERÇEK WHATSAPP İKONU ---
+# --- WHATSAPP İKONU ---
 whatsapp_url = f"https://wa.me/{WHATSAPP_PHONE}?text=Merhaba%2C%20YARENART%20ürünleri%20hakkında%20bilgi%20almak%20istiyorum."
 
 st.markdown(f"""
