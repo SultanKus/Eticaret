@@ -8,12 +8,16 @@ import os
 # Sayfa Ayarları (Geniş Ekran)
 st.set_page_config(page_title="YARENART | Sanat & İllüstrasyon Mağazası", page_icon="🎨", layout="wide")
 
-# Veri Dosyası Yolları
+# Veri Dosyası ve Klasör Yolları
 CSV_FILE = "products.csv"
 USERS_FILE = "users.csv"
 ADDRESS_FILE = "addresses.csv"
+UPLOAD_DIR = "uploaded_images"
 ADMIN_EMAIL = "skus42173@gmail.com"
 WHATSAPP_PHONE = "905527920708"
+
+if not os.path.exists(UPLOAD_DIR):
+    os.makedirs(UPLOAD_DIR)
 
 # Türkiye Tüm İller ve İlçeler Sözlüğü
 TURKEY_CITIES = {
@@ -28,7 +32,7 @@ TURKEY_CITIES = {
     "Diğer": ["Merkez / Diğer İlçe"]
 }
 
-# Sıcak Sanatsal Tasarım & Otomatik + Elle Kaydırılabilir Slider CSS
+# Sıcak Sanatsal Tasarım & CSS Stilleri
 st.markdown("""
     <style>
     .stApp {
@@ -59,8 +63,6 @@ st.markdown("""
         background-color: #BC6C25 !important;
         color: #FFFFFF !important;
     }
-    
-    /* Otomatik Akan ve Elle Kaydırılabilen (Interactive Marquee) Slider */
     .slider-wrapper {
         overflow: hidden;
         width: 100%;
@@ -102,7 +104,6 @@ st.markdown("""
         font-size: 15px;
         margin: 10px 5px 5px 5px;
     }
-    
     @keyframes scrollAuto {
         0% { transform: translateX(0); }
         100% { transform: translateX(-50%); }
@@ -110,7 +111,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Veri Dosyalarını Başlatma (Arkadaşının gerçek eseri 1. sırada ve gerçek görseliyle)
+# Veri Dosyalarını Başlatma
 if not os.path.exists(CSV_FILE):
     initial_data = {
         "id": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
@@ -120,7 +121,7 @@ if not os.path.exists(CSV_FILE):
         "category": ["Baş Yapıt", "Soyut Kanvas", "Soyut Kanvas", "Soyut Kanvas", "Baş Yapıt", "Siyah Beyaz", "Manzara", "Özel Seri", "Soyut Kanvas", "Baş Yapıt", "Özel Seri", "Manzara"],
         "price": [2500.0, 1000.0, 1150.0, 1200.0, 1450.0, 850.0, 1100.0, 1500.0, 900.0, 1750.0, 1300.0, 980.0],
         "stock": [1, 3, 5, 2, 4, 1, 6, 2, 4, 2, 3, 5],
-        "description": ["Sanatçının elinden çıkan orijinal, derin anlamlar barındıran eşsiz başyapıt[cite: 5].", "Yüksek kaliteli tuval üzerine özel modern tasarım.", "Evinize şıklık katacak renk tonları.", "Altın varak detaylı lüks dokunuş.",
+        "description": ["Sanatçının elinden çıkan orijinal başyapıt[cite: 5].", "Yüksek kaliteli tuval üzerine özel modern tasarım.", "Evinize şıklık katacak renk tonları.", "Altın varak detaylı lüks dokunuş.",
                         "Klasik sanatın modern tuvale yansıması.", "Siyah beyaz sokak konsepti.", "Huzur veren doğa manzarası.", "Sınırlı sayıda üretilmiş özel eser.",
                         "Toprak tonlarının huzur veren uyumu.", "İstanbul'un eşsiz silüeti altın varaklı.", "Derin mavi tonlarında mistik geçişler.", "Doğal bitki motifleriyle ferahlık."],
         "image_url": [
@@ -190,13 +191,11 @@ st.markdown("""
 st.markdown("""
     <div class="slider-wrapper">
         <div class="slider-track">
-            <!-- 1. Döngü -->
             <div class="slide-item"><img src="https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Surreal Başyapıt</div></div>
             <div class="slide-item"><img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Soyut Geometrik</div></div>
             <div class="slide-item"><img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Siyah Beyaz Koleksiyon</div></div>
             <div class="slide-item"><img src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Manzara Serisi</div></div>
             <div class="slide-item"><img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Özel İllüstrasyon</div></div>
-            <!-- Kesintisiz Akış İçin Tekrar (2. Döngü) -->
             <div class="slide-item"><img src="https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Surreal Başyapıt</div></div>
             <div class="slide-item"><img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Soyut Geometrik</div></div>
             <div class="slide-item"><img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=500&q=80"><div class="slide-title">Siyah Beyaz Koleksiyon</div></div>
@@ -280,7 +279,7 @@ else:
 
 st.sidebar.divider()
 
-# --- ADMIN PANELİ ---
+# --- ADMIN PANELİ (BİLGİSAYARDAN DOSYA YÜKLEME DESTEKLİ) ---
 if st.session_state.logged_in and st.session_state.user_email == ADMIN_EMAIL:
     st.sidebar.subheader("🛠️ Mağaza Yönetimi (Admin)")
     admin_mode = st.sidebar.checkbox("Yönetim Paneli Aç", key="admin_chk")
@@ -293,22 +292,39 @@ if st.session_state.logged_in and st.session_state.user_email == ADMIN_EMAIL:
         new_price = st.sidebar.number_input("Fiyat (TL)", min_value=0.0, value=1000.0, key="admin_prod_price")
         new_stock = st.sidebar.number_input("Stok Adedi", min_value=1, value=1, key="admin_prod_stock")
         new_desc = st.sidebar.text_area("Açıklama", key="admin_prod_desc")
-        new_img = st.sidebar.text_input("Görsel URL", key="admin_prod_img")
         
+        # BİLGİSAYARDAN RESİM YÜKLEME ALANI
+        uploaded_file = st.sidebar.file_uploader("Bilgisayardan Görsel Seç (PNG, JPG)", type=["png", "jpg", "jpeg"], key="admin_img_upload")
+        
+        # Alternatif olarak URL ile de yüklenebilsin
+        alt_img_url = st.sidebar.text_input("Veya Görsel URL Yapıştır", key="admin_prod_img")
+
         if st.sidebar.button("Ürünü Mağazaya Ekle", key="admin_btn_add"):
-            if new_title and new_img:
+            final_image_path = ""
+            if uploaded_file is not None:
+                # Dosyayı sunucuya / klasöre kaydet
+                file_path = os.path.join(UPLOAD_DIR, uploaded_file.name)
+                with open(file_path, "wb") as f:
+                    f.write(uploaded_file.getbuffer())
+                final_image_path = file_path
+            elif alt_img_url:
+                final_image_path = alt_img_url
+            else:
+                final_image_path = "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=600&q=80"
+
+            if new_title:
                 product_df = load_products()
                 new_id = int(product_df["id"].max() + 1) if not product_df.empty else 1
                 new_row = pd.DataFrame([{
                     "id": new_id, "title": new_title, "category": new_cat,
-                    "price": new_price, "stock": new_stock, "description": new_desc, "image_url": new_img
+                    "price": new_price, "stock": new_stock, "description": new_desc, "image_url": final_image_path
                 }])
                 updated_df = pd.concat([product_df, new_row], ignore_index=True)
                 updated_df.to_csv(CSV_FILE, index=False)
                 st.sidebar.success("Ürün başarıyla eklendi!")
                 st.rerun()
             else:
-                st.sidebar.warning("Eser adı ve görsel URL zorunludur.")
+                st.sidebar.warning("Eser adı zorunludur.")
     st.sidebar.divider()
 
 # --- SEPET VE ADRES SEÇİMİ ---
