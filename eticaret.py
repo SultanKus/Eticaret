@@ -1,8 +1,5 @@
 import streamlit as st
 import pandas as pd
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 import os
 
 # Sayfa Ayarları (Geniş Ekran)
@@ -13,6 +10,33 @@ CSV_FILE = "products.csv"
 USERS_FILE = "users.csv"
 ADMIN_EMAIL = "skus42173@gmail.com"
 WHATSAPP_PHONE = "905527920708"
+
+# Sıcak Sanatsal Tasarım & CSS Entegrasyonu
+st.markdown("""
+    <style>
+    .stApp {
+        background-color: #FDFBF7;
+        color: #2C2A29;
+    }
+    .hero-banner {
+        background: linear-gradient(135deg, #D4A373, #CCD5AE, #E9EDC9);
+        padding: 40px;
+        border-radius: 15px;
+        text-align: center;
+        color: #283618;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    .product-card {
+        background-color: #FFFFFF;
+        padding: 15px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        margin-bottom: 20px;
+        border: 1px solid #E6DFD5;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 # Varsayılan Ürün Verilerini Oluştur (Eğer yoksa)
 if not os.path.exists(CSV_FILE):
@@ -68,20 +92,26 @@ def send_real_email(to_email, subject, body):
         print(f"Mail hatası: {e}")
         return False
 
-# --- ÖZEL BAŞLIK & LOGO (YARENART) ---
+# --- ŞIK YARENART BAŞLIĞI ---
 st.markdown("""
-    <div style='text-align: center; padding: 10px 0;'>
-        <h1 style='font-family: sans-serif; font-size: 48px; font-weight: 800; background: linear-gradient(45deg, #ff4b1f, #ff9068, #7f00ff, #e100ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>
+    <div style='text-align: center; padding: 15px 0;'>
+        <h1 style='font-family: serif; font-size: 52px; font-weight: bold; color: #4A3B32; letter-spacing: 2px;'>
             ✨ YARENART ✨
         </h1>
-        <p style='color: #666; font-size: 18px; font-weight: 500;'>Eşsiz El Yapımı Çizimler, Tuval ve Özel Seri Tablolar</p>
+        <p style='color: #8C7A6B; font-size: 18px; font-style: italic;'>Ressamın Elinden Sanatsal Dokunuşlar & Tablolar</p>
     </div>
 """, unsafe_allow_html=True)
 
-st.divider()
+# --- KAYAN / BANNER VİTRİN ALANI (HERO SLIDER GÖRÜNÜMÜ) ---
+st.markdown("""
+    <div class="hero-banner">
+        <h2 style='font-family: serif; margin-bottom: 10px;'>Çerçeveli & Orijinal Tuval Koleksiyonu</h2>
+        <p style='font-size: 16px; margin-bottom: 0;'>Eşsiz renk geçişleri ve özel tasarım el yapımı eserler şimdi sizlerle.</p>
+    </div>
+""", unsafe_allow_html=True)
 
-# --- ÖRNEK GÖRSELDEKİ ÖNE ÇIKAN KATEGORİ SLIDER/KARTLARI ---
-st.markdown("### 🌟 Öne Çıkan Koleksiyonlar")
+# --- ÖRNEK GÖRSELDEKİ KATEGORİ KARTLARI ---
+st.markdown("### 🏛️ Öne Çıkan Koleksiyonlar")
 cat_cols = st.columns(4)
 categories_show = [
     ("Baş Yapıt Kanvaslar", "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=500&q=80"),
@@ -93,7 +123,7 @@ categories_show = [
 for idx, (cat_name, cat_img) in enumerate(categories_show):
     with cat_cols[idx]:
         st.image(cat_img, use_container_width=True)
-        st.markdown(f"<p style='text-align: center; font-weight: bold;'>{cat_name}</p>", unsafe_allow_html=True)
+        st.markdown(f"<p style='text-align: center; font-weight: bold; color: #4A3B32;'>{cat_name}</p>", unsafe_allow_html=True)
 
 st.divider()
 
@@ -138,7 +168,7 @@ if not st.session_state.logged_in:
             else:
                 st.sidebar.error("Hatalı e-posta veya şifre!")
 else:
-    st.sidebar.write(f"Hoş geldin, **{st.session_state.user_name}**")
+    st.sidebar.write(f"Hoş geldin, **{st.session_state.user_name}** ({st.session_state.user_email})")
     if st.sidebar.button("Çıkış Yap"):
         st.session_state.logged_in = False
         st.session_state.user_name = ""
@@ -233,7 +263,7 @@ else:
     st.sidebar.write("Sepetiniz boş.")
 
 # --- KATEGORİ FİLTRELEME & 4'LÜ VİTRİN ---
-st.subheader("🛍️ Tüm Ürünler")
+st.markdown("### 🎨 Tüm Sanat Eserleri")
 selected_cat = st.selectbox("Kategoriye Göre Filtrele", ["Tümü", "Soyut Kanvas", "Baş Yapıt", "Siyah Beyaz", "Manzara", "Özel Seri"])
 
 if selected_cat != "Tümü":
@@ -250,7 +280,7 @@ for row_chunk in rows:
         with cols[col_idx]:
             st.image(row["image_url"], use_container_width=True)
             st.markdown(f"**{row['title']}**")
-            st.markdown(f"Kategori: {row['category']}")
+            st.markdown(f"<span style='color: #8C7A6B;'>Kategori: {row['category']}</span>", unsafe_allow_html=True)
             st.markdown(f"**Fiyat: {row['price']:,.2f} TL**")
             
             if st.button("Sepete Ekle", key=f"product_{row['id']}"):
@@ -261,12 +291,14 @@ for row_chunk in rows:
                 })
                 st.success("Sepete eklendi!")
 
-# --- SAĞ ALT KÖŞEDE WHATSAPP SABİT BUTON VE FOOTER ---
+# --- SAĞ ALT KÖŞEDE GERÇEK WHATSAPP İKONU ---
 whatsapp_url = f"https://wa.me/{WHATSAPP_PHONE}?text=Merhaba%2C%20YARENART%20ürünleri%20hakkında%20bilgi%20almak%20istiyorum."
 
 st.markdown(f"""
-    <a href="{whatsapp_url}" target="_blank" style="position: fixed; bottom: 30px; right: 30px; z-index: 9999; background-color: #25d366; color: white; padding: 15px; border-radius: 50px; text-decoration: none; font-size: 24px; box-shadow: 2px 2px 10px rgba(0,0.0,0.3);">
-        💬
+    <a href="{whatsapp_url}" target="_blank" style="position: fixed; bottom: 30px; right: 30px; z-index: 9999; background-color: #25D366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 2px 4px 12px rgba(0,0,0,0.25); text-decoration: none;">
+        <svg viewBox="0 0 32 32" width="36" height="36" fill="white">
+            <path d="M16.5 3C9.04 3 3 9.04 3 16.5c0 2.37.62 4.63 1.74 6.6L3 29l6.11-1.6c1.9 1.03 4.12 1.6 6.39 1.6 7.46 0 13.5-6.04 13.5-13.5S23.96 3 16.5 3zm0 24.5c-1.99 0-3.87-.56-5.46-1.53l-.39-.23-3.61.95.97-3.52-.25-.41A10.98 10.98 0 015.5 16.5C5.5 10.48 10.48 5.5 16.5 5.5S27.5 10.48 27.5 16.5 22.52 27.5 16.5 27.5zm6.05-8.24c-.33-.17-1.95-.96-2.25-1.07-.3-.11-.52-.17-.74.17-.22.33-.85 1.07-1.04 1.29-.19.22-.38.25-.71.08-.33-.17-1.4-.52-2.67-1.65-.99-.88-1.66-1.97-1.85-2.3-.19-.33-.02-.51.14-.68.15-.15.33-.38.5-.57.17-.19.22-.33.33-.55.11-.22.06-.41-.03-.57-.09-.17-.74-1.78-1.01-2.44-.27-.64-.54-.55-.74-.56h-.63c-.22 0-.57.08-.87.41-.3.33-1.14 1.11-1.14 2.72 0 1.61 1.17 3.17 1.33 3.39.17.22 2.3 3.51 5.57 4.92.78.34 1.39.54 1.87.69.79.25 1.51.21 2.08.13.64-.1 1.95-.8 2.23-1.57.28-.77.28-1.43.2-1.57-.08-.14-.3-.22-.63-.39z"/>
+        </svg>
     </a>
 """, unsafe_allow_html=True)
 
@@ -276,4 +308,5 @@ st.markdown(f"""
 - **WhatsApp Destek Hattı:** [{WHATSAPP_PHONE}](https://wa.me/{WHATSAPP_PHONE})
 - **E-posta:** `{ADMIN_EMAIL}`
 - **Instagram:** [@yarenart](https://instagram.com)
+- **Atölye Konumu:** İstanbul / Kadıköy
 """)
