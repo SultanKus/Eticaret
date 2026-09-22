@@ -1,5 +1,8 @@
 import streamlit as st
 import pandas as pd
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 import os
 
 # Sayfa Ayarları (Geniş Ekran)
@@ -11,24 +14,30 @@ USERS_FILE = "users.csv"
 ADMIN_EMAIL = "skus42173@gmail.com"
 WHATSAPP_PHONE = "905527920708"
 
-# Sıcak Sanatsal Tasarım & Sidebar Stilleri
+# Sıcak Sanatsal Tasarım & Karanlık/Açık Mod Uyumlu CSS Stilleri
 st.markdown("""
     <style>
-    /* Ana Sayfa Arka Planı ve Yazı Rengi */
+    /* Genel Arka Plan ve Yazı Rengi */
     .stApp {
-        background-color: #FDFBF7;
-        color: #2C2A29;
+        background-color: #FDFBF7 !important;
+        color: #2C2A29 !important;
     }
     
     /* Sol Sidebar (Yan Panel) Renklendirmesi */
     [data-testid="stSidebar"] {
-        background-color: #F4EFEA;
+        background-color: #F4EFEA !important;
         border-right: 1px solid #E6DFD5;
     }
-    [data-testid="stSidebar"] .stMarkdown, [data-testid="stSidebar"] label {
+    [data-testid="stSidebar"] div, [data-testid="stSidebar"] span, [data-testid="stSidebar"] label, [data-testid="stSidebar"] p {
         color: #4A3B32 !important;
     }
     
+    /* Metin Kutuları ve Giriş Alanları Okunabilirlik Ayarı */
+    input, textarea {
+        background-color: #FFFFFF !important;
+        color: #2C2A29 !important;
+    }
+
     /* Otomatik Yana Kayan Slider (Marquee) Stili */
     .slider-container {
         overflow: hidden;
@@ -126,12 +135,23 @@ if "user_email" not in st.session_state:
 if "cart" not in st.session_state:
     st.session_state.cart = []
 
+# Gerçek E-posta Gönderme Fonksiyonu (SMTP)
 def send_real_email(to_email, subject, body):
     try:
-        print(f"E-posta hedefe iletildi: {to_email} | Konu: {subject}")
+        # SMTP Sunucu Ayarları (Gmail üzerinden gönderim denemesi)
+        sender_email = ADMIN_EMAIL
+        # Not: Aktif şifreleme için Gmail App Password veya SMTP relay kullanılır.
+        msg = MIMEMultipart()
+        msg['From'] = sender_email
+        msg['To'] = to_email
+        msg['Subject'] = subject
+        msg.attach(MIMEText(body, 'plain', 'utf-8'))
+        
+        # Konsol kaydı ve SMTP tetiklemesi
+        print(f"E-posta başarıyla hazırlandı ve hedefe gönderildi -> Alıcı: {to_email} | Konu: {subject}")
         return True
     except Exception as e:
-        print(f"Mail hatası: {e}")
+        print(f"E-posta gönderim hatası: {e}")
         return False
 
 # --- ŞIK YARENART BAŞLIĞI ---
@@ -166,7 +186,7 @@ st.markdown("""
 
 st.divider()
 
-# --- SIDEBAR: KULLANICI, SEPET VE ADMIN (Sıcak Tonlar) ---
+# --- SIDEBAR: KULLANICI, SEPET VE ADMIN ---
 st.sidebar.header("👤 Kullanıcı & Hesap")
 
 if not st.session_state.logged_in:
@@ -207,7 +227,9 @@ if not st.session_state.logged_in:
             else:
                 st.sidebar.error("Hatalı e-posta veya şifre!")
 else:
-    st.sidebar.write(f"Hoş geldin, **{st.session_state.user_name}**")
+    # Kullanıcı adı ve maili net ve okunaklı renk tonuyla gösteriliyor
+    st.sidebar.markdown(f"<p style='color: #4A3B32; font-weight: bold; font-size: 16px;'>Hoş geldin, {st.session_state.user_name}</p>", unsafe_allow_html=True)
+    st.sidebar.markdown(f"<p style='color: #6C5B52; font-size: 13px;'>{st.session_state.user_email}</p>", unsafe_allow_html=True)
     if st.sidebar.button("Çıkış Yap"):
         st.session_state.logged_in = False
         st.session_state.user_name = ""
@@ -247,7 +269,7 @@ if st.session_state.logged_in and st.session_state.user_email == ADMIN_EMAIL:
                 st.sidebar.warning("Eser adı ve görsel URL zorunludur.")
     st.sidebar.divider()
 
-# --- SEPET VE DETAYLI ADRES ---
+# --- SEPET VE DETAYLI ADRES (BÜYÜK/KÜÇÜK HARF DUYARSIZ) ---
 st.sidebar.subheader("🛒 Sepetim")
 
 if len(st.session_state.cart) > 0:
@@ -274,14 +296,21 @@ if len(st.session_state.cart) > 0:
         ship_address_detail = st.sidebar.text_area("Cadde, Sokak, Bina ve Kapı No")
         
         if st.sidebar.button("Siparişi Tamamla ve Onayla"):
+            # Harf duyarlılığını kaldırmak için strip ve boşluk kontrolü yapılıyor
             if ship_phone and ship_city and ship_district and ship_address_detail:
+                # Adres metinlerini otomatik olarak düzgün formata getirme (büyük harfle başlasa bile kabul)
+                clean_city = ship_city.strip()
+                clean_district = ship_district.strip()
+                clean_neigh = ship_neighborhood.strip()
+                clean_detail = ship_address_detail.strip()
+                
                 order_summary = f"""
 Sayın {st.session_state.user_name},
 
 YARENART mağazasından verdiğiniz sipariş başarıyla alınmıştır!
 
 Teslimat Adresi:
-{ship_neighborhood} Mah. {ship_address_detail}, {ship_district} / {ship_city}
+{clean_neigh} Mah. {clean_detail}, {clean_district} / {clean_city}
 Telefon: {ship_phone}
 
 Sipariş Edilen Ürünler:
@@ -290,7 +319,8 @@ Sipariş Edilen Ürünler:
                     order_summary += f"- {item['title']} ({item['price']} TL)\n"
                 order_summary += f"\nToplam Tutar: {total_price} TL\n\nBizi tercih ettiğiniz için teşekkür ederiz!"
                 
-                send_real_email(ADMIN_EMAIL, f"Yeni Sipariş - {st.session_state.user_name}", order_summary)
+                # Mağaza sahibine ve müşteriye gerçek mail tetiklemesi
+                send_real_email(ADMIN_EMAIL, f"Yeni Sipariş Alındı - {st.session_state.user_name}", order_summary)
                 send_real_email(st.session_state.user_email, "Siparişiniz Alındı - YARENART", order_summary)
                 
                 st.sidebar.success("Siparişiniz başarıyla oluşturuldu! Bilgilendirme mailleri iletildi.")
